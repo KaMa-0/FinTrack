@@ -2,6 +2,7 @@
 Financial Tracking Tool
 
 ## Project Structure
+```
 FinTrack/
 ├── README.md
 ├── backend             # Backend components
@@ -15,3 +16,4 @@ FinTrack/
         ├── assets      # Dynamic Assets
         ├── pages       # Webpages, Screens
         └── services    # API/Backend calls
+```
