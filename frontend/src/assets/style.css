@@ -1,10 +1,7 @@
-/* FinTrack Styles */
-
 /* Global Styles */
 body {
     background-color: #f8f9fa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-image: url('images/LoginScreen.png');
 }
 
 /* Card Styles */
@@ -13,6 +10,7 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     border: none;
+    background-color: rgba(255, 255, 255, 0.95);
 }
 
 .card-header {
@@ -22,10 +20,29 @@ body {
 }
 
 /* Login & Register Specific Styles */
-#login-container .card,
-#register-container .card {
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+.auth-container {
+    min-height: 100vh;
+    background-image: url('./login-background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.auth-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.auth-container > .container {
+    position: relative;
+    z-index: 2;
 }
 
 .card-title {
@@ -44,16 +61,4 @@ body {
 .btn-primary:hover {
     background-color: #3a56d4;
     border-color: #3a56d4;
-}
-
-/* Links in login/register forms */
-#register-link,
-#login-link {
-    color: #4361ee;
-    text-decoration: none;
-}
-
-#register-link:hover,
-#login-link:hover {
-    text-decoration: underline;
 }
