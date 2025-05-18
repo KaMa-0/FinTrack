@@ -1,36 +1,54 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Imports routing components
-import 'bootstrap/dist/css/bootstrap.min.css'; // Imports Bootstrap CSS
-import '../assets/style.css'; // Imports custom styles
+import { useNavigate, Link } from 'react-router-dom';
+import { authService } from '../services/authService'; // Import the auth service
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../assets/style.css';
 
 function Register() {
-    const [email, setEmail] = useState(''); // State for email input
-    const [password, setPassword] = useState(''); // State for password input
-    const navigate = useNavigate(); // Hook for programmatic navigation
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState(''); // For displaying error messages
+    const [loading, setLoading] = useState(false); // For displaying a loading state
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
-        // Function to handle form submission
-        e.preventDefault(); // Prevents default form submission behavior
-        // Hier später die Registrierungs-Logik implementieren (Registration logic to be implemented later)
-        navigate('/login'); // Redirects to login page
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+            // Call the registration API
+            await authService.signUp(email, password);
+            // If successful, redirect to login
+            navigate('/login');
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div className="auth-container"> {/* Container with background image */}
-            <div className="container mt-5"> {/* Container with top margin */}
-                <div className="row justify-content-center"> {/* Centers content horizontally */}
-                    <div className="col-md-6"> {/* Responsive column width */}
+        <div className="auth-container">
+            <div className="container pt-5">
+                <div className="row justify-content-center">
+                    <div className="col-md-6">
                         <div className="card">
                             <div className="card-body">
-                                <h2 className="text-center mb-4">Registrierung</h2> {/* Registration header in German */}
+                                <h2 className="text-center mb-4">Registrierung</h2>
+                                {error && (
+                                    <div className="alert alert-danger" role="alert">
+                                        {error}
+                                    </div>
+                                )}
                                 <form onSubmit={handleSubmit}>
-                                    <div className="mb-3"> {/* Form group with bottom margin */}
+                                    <div className="mb-3">
                                         <input
                                             type="email"
                                             className="form-control"
                                             placeholder="E-Mail"
                                             value={email}
-                                            onChange={(e) => setEmail(e.target.value)} // Updates email state
+                                            onChange={(e) => setEmail(e.target.value)}
                                             required
                                         />
                                     </div>
@@ -40,16 +58,20 @@ function Register() {
                                             className="form-control"
                                             placeholder="Passwort"
                                             value={password}
-                                            onChange={(e) => setPassword(e.target.value)} // Updates password state
+                                            onChange={(e) => setPassword(e.target.value)}
                                             required
                                         />
                                     </div>
-                                    <button type="submit" className="btn btn-primary w-100 mb-3">
-                                        Registrieren {/* Register button in German */}
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary w-100 mb-3"
+                                        disabled={loading}
+                                    >
+                                        {loading ? 'Registriere...' : 'Registrieren'}
                                     </button>
                                     <div className="text-center">
                                         <Link to="/login" className="btn btn-outline-secondary">
-                                            Bereits ein Konto? Hier einloggen {/* Already have an account? Login here */}
+                                            Bereits ein Konto? Hier einloggen
                                         </Link>
                                     </div>
                                 </form>
@@ -62,4 +84,4 @@ function Register() {
     );
 }
 
-export default Register; // Exports Register component
+export default Register;
