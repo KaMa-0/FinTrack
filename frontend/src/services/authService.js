@@ -1,5 +1,5 @@
 // src/services/authService.js
-const API_URL = 'http://localhost:5000/api/auth/'; // Adjust this URL to match your backend
+const API_URL = 'http://localhost:5001/api/auth/'; // Adjust this URL to match your backend
 
 export const authService = {
     // Register a new user
