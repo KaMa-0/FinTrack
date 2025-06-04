@@ -27,6 +27,7 @@ const Navigation = () => {
                 <Link to="/" onClick={toggleMenu}>Dashboard</Link>
                 <Link to="/transaction" onClick={toggleMenu}>Transaktion</Link>
                 <Link to="/account-statement" onClick={toggleMenu}>Kontoauszug</Link>
+                <Link to="/currency-converter" onClick={toggleMenu}>Währungsrechner</Link>
                 <button className="logout-button" onClick={handleLogout}>Abmelden</button>
             </nav>
         </div>

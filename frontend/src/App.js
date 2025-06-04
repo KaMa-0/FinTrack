@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Transaction from './pages/Transaction';
 import AccountStatement from "./pages/AccountStatement";
+import CurrencyConverter from './pages/CurrencyConverter';
 import Navigation from './components/Navigation';
 
 const PrivateRoute = ({ children }) => {
@@ -18,7 +19,9 @@ const PrivateRoute = ({ children }) => {
     return (
         <>
             <Navigation />
-            {children}
+            <main>
+                {children}
+            </main>
         </>
     );
 };
@@ -44,10 +47,14 @@ function App() {
                         <AccountStatement />
                     </PrivateRoute>
                 } />
+                <Route path="/currency-converter" element={
+                    <PrivateRoute>
+                        <CurrencyConverter />
+                    </PrivateRoute>
+                } />
             </Routes>
         </Router>
     );
 }
-
 
 export default App;
