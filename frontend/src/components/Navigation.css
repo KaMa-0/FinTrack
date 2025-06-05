@@ -59,23 +59,17 @@
     padding: 20px;
     border-bottom: 1px solid #ecf0f1;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;  /* center by default */
     align-items: center;
+    position: relative;
 }
 
 .nav-header h3 {
     margin: 0;
     color: #3498db;
     font-size: 24px;
-}
-
-.close-menu {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #7f8c8d;
-    cursor: pointer;
+    text-align: center;
+    width: 100%; /* make sure it spans full width for centering */
 }
 
 .sidebar-nav-links {

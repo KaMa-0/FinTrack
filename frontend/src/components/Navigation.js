@@ -57,11 +57,6 @@ const Navigation = () => {
             <nav className={`nav-menu ${isOpen ? 'active' : ''}`}>
                 <div className="nav-header">
                     <h3>FinTrack</h3>
-                    {isMobile && (
-                        <button className="close-menu" onClick={toggleMenu}>
-                            <i className="fas fa-times"></i>
-                        </button>
-                    )}
                 </div>
 
                 <div className="sidebar-nav-links">
