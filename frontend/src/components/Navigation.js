@@ -64,7 +64,7 @@ const Navigation = () => {
                     )}
                 </div>
 
-                <div className="nav-links">
+                <div className="sidebar-nav-links">
                     <Link
                         to="/dashboard"
                         className={location.pathname === '/dashboard' ? 'active' : ''}
