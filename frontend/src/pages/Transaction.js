@@ -19,7 +19,7 @@ function Transaction() {
     // GET - Fetch all transactions
     const fetchTransactions = async () => {
         try {
-            const response = await fetch('http://localhost:5001/api/transactions', {
+            const response = await fetch('http://localhost:5000/api/transactions', {
                 headers: {
                     'Authorization': `Bearer ${user.token}`
                 }
@@ -52,8 +52,8 @@ function Transaction() {
 
         try {
             const url = editingId
-                ? `http://localhost:5001/api/transactions/${editingId}`
-                : 'http://localhost:5001/api/transactions';
+                ? `http://localhost:5000/api/transactions/${editingId}`
+                : 'http://localhost:5000/api/transactions';
 
             const method = editingId ? 'PUT' : 'POST';
 
@@ -82,7 +82,7 @@ function Transaction() {
     const handleDelete = async (id) => {
         if (window.confirm('Diese Transaktion wirklich löschen?')) {
             try {
-                const response = await fetch(`http://localhost:5001/api/transactions/${id}`, {
+                const response = await fetch(`http://localhost:5000/api/transactions/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${user.token}`
@@ -275,6 +275,24 @@ function Transaction() {
                                                         onClick={() => handleEdit(transaction)}
                                                     >
                                                         <i className="fas fa-edit"></i>
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-outline-warning me-1"
+                                                        onClick={() => {
+                                                            const newAmount = prompt('Neuer Betrag:', transaction.amount);
+                                                            if (newAmount) {
+                                                                fetch(`http://localhost:5000/api/transactions/${transaction._id}`, {
+                                                                    method: 'PATCH',
+                                                                    headers: {
+                                                                        'Content-Type': 'application/json',
+                                                                        'Authorization': `Bearer ${user.token}`
+                                                                    },
+                                                                    body: JSON.stringify({ amount: parseFloat(newAmount) })
+                                                                }).then(() => fetchTransactions());
+                                                            }
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-coins"></i>
                                                     </button>
                                                     <button
                                                         className="btn btn-sm btn-outline-danger"

@@ -26,6 +26,18 @@ const transactionController = require('../controllers/transactionController');
  *                   description:
  *                     type: string
  */
-router.get('/', auth, transactionController.getTransactions);
+router.get('/', auth.verifyToken, transactionController.getTransactions);
+
+// POST - Create transaction
+router.post('/', auth.verifyToken, transactionController.createTransaction);
+
+// PUT - Update entire transaction
+router.put('/:id', auth.verifyToken, transactionController.updateTransaction);
+
+// PATCH - Partially update transaction
+router.patch('/:id', auth.verifyToken, transactionController.patchTransaction);
+
+// DELETE - Delete transaction
+router.delete('/:id', auth.verifyToken, transactionController.deleteTransaction);
 
 module.exports = router;

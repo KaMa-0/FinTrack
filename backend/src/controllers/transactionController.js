@@ -40,6 +40,23 @@ exports.updateTransaction = async (req, res) => {
     }
 };
 
+// PATCH - Partially update transaction
+exports.patchTransaction = async (req, res) => {
+    try {
+        const transaction = await Transaction.findOneAndUpdate(
+            { _id: req.params.id, userId: req.userId },
+            { $set: req.body },
+            { new: true, runValidators: true }
+        );
+        if (!transaction) {
+            return res.status(404).json({ error: 'Transaction not found' });
+        }
+        res.json(transaction);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
 // DELETE - Delete transaction
 exports.deleteTransaction = async (req, res) => {
     try {

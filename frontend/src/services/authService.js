@@ -1,16 +1,15 @@
 // src/services/authService.js
-const API_URL = 'http://localhost:5001/api/auth/'; // Adjust this URL to match your backend
-
+const API_URL = 'http://localhost:5000/api/auth/'; //
 export const authService = {
     // Register a new user
-    signUp: async (email, password) => {
+    signUp: async (userData) => {
         try {
             const response = await fetch(`${API_URL}register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify(userData),
             });
 
             if (!response.ok) {
@@ -20,7 +19,7 @@ export const authService = {
 
             const data = await response.json();
             // Store the token in localStorage
-            localStorage.setItem('user', JSON.stringify({ email, token: data.token }));
+            localStorage.setItem('user', JSON.stringify({ email: userData.email, token: data.token }));
             return data;
         } catch (error) {
             console.error('Sign up error:', error);

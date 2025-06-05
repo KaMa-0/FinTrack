@@ -4,7 +4,30 @@ const bcrypt = require('bcryptjs');
 
 exports.register = async (req, res) => {
     try {
-        const user = await User.create(req.body);
+        const {
+            email,
+            password,
+            firstName,
+            lastName,
+            phone,
+            birthDate,
+            address,
+            city,
+            postalCode
+        } = req.body;
+
+        const user = await User.create({
+            email,
+            password,
+            firstName,
+            lastName,
+            phone,
+            birthDate,
+            address,
+            city,
+            postalCode
+        });
+
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
         res.status(201).json({ token });
     } catch (error) {
