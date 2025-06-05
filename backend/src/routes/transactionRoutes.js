@@ -1,3 +1,8 @@
+const express = require('express');
+const router = express.Router();
+const auth = require('../middleware/auth');
+const transactionController = require('../controllers/transactionController');
+
 /**
  * @swagger
  * /api/transactions:
@@ -22,3 +27,5 @@
  *                     type: string
  */
 router.get('/', auth, transactionController.getTransactions);
+
+module.exports = router;
