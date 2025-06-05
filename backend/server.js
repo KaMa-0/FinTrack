@@ -23,6 +23,8 @@ app.use('/api/auth', require('./src/routes/auth'));
 app.get('/', (req, res) => {
     res.send('FinTrack API is running');
 });
+app.use('/api/transactions', require('./src/routes/transactionRoutes'));
+
 
 // Start server
 const PORT = process.env.PORT || 5001;
