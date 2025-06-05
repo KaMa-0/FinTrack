@@ -1,13 +1,12 @@
-// backend/swagger.js
 const swaggerJsDoc = require('swagger-jsdoc');
 
 const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Währungsumrechnung API',
+            title: 'FinTrack API',
             version: '1.0.0',
-            description: 'API für die Währungsumrechnung-Funktionalität'
+            description: 'API für FinTrack'
         },
         servers: [
             {
@@ -15,7 +14,7 @@ const swaggerOptions = {
             }
         ]
     },
-    apis: ['./routes/*.js']
+    apis: ['./src/routes/*.js'] // Pfad zu den Routen-Dateien
 };
 
 module.exports = swaggerJsDoc(swaggerOptions);
