@@ -199,17 +199,18 @@
     }
 
     .nav-links {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: white;
-        flex-direction: column;
-        padding: 20px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        border-radius: 10px;
-        display: none;
-        min-width: 200px;
-        gap: 15px;
+    	position: absolute;
+    	top: 100%;
+    	right: 20px; /* shift a bit left from screen edge */
+    	background: white;
+    	flex-direction: column;
+    	padding: 20px;
+    	box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    	border-radius: 10px;
+    	display: none;
+    	min-width: 200px;
+    	gap: 15px;
+    	z-index: 999; /* ✅ ensure above everything */
     }
 
     .nav-links.active {
