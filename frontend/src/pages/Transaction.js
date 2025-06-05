@@ -128,7 +128,7 @@ function Transaction() {
                                 {editingId ? 'Transaktion bearbeiten' : 'Neue Transaktion'}
                             </h5>
                             <button
-                                onClick={() => navigate('/')}
+                                onClick={() => navigate('/dashboard')}
                                 className="btn btn-sm btn-outline-secondary"
                             >
                                 Zurück

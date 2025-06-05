@@ -1,75 +1,183 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Imports navigation hook
-import 'bootstrap/dist/css/bootstrap.min.css'; // Imports Bootstrap CSS
+// frontend/src/pages/Dashboard.js
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './Dashboard.css';
 
 function Dashboard() {
-    const user = JSON.parse(localStorage.getItem('user')); // Gets user data from localStorage
-    const navigate = useNavigate(); // Hook for programmatic navigation
+    const user = JSON.parse(localStorage.getItem('user'));
+    const navigate = useNavigate();
+    const [transactions, setTransactions] = useState([]);
+    const [balance, setBalance] = useState(0);
+    const [income, setIncome] = useState(0);
+    const [expenses, setExpenses] = useState(0);
 
-    const handleLogout = () => {
-        // Function to handle logout button click
-        localStorage.removeItem('user'); // Removes user data from localStorage
-        navigate('/login'); // Redirects to login page
+    useEffect(() => {
+        fetchTransactions();
+    }, []);
+
+    const fetchTransactions = async () => {
+        try {
+            const response = await fetch('http://localhost:5001/api/transactions', {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setTransactions(data.slice(0, 5)); // Last 5 transactions
+                calculateTotals(data);
+            }
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+        }
     };
 
-    const handleNewTransaction = () => {
-        navigate('/transaction');
-    }
+    const calculateTotals = (data) => {
+        let totalIncome = 0;
+        let totalExpenses = 0;
 
-    const handleAccountStatement = () => {
-        navigate('/account-statement');
-    }
+        data.forEach(transaction => {
+            if (transaction.type === 'income') {
+                totalIncome += transaction.amount;
+            } else {
+                totalExpenses += transaction.amount;
+            }
+        });
+
+        setIncome(totalIncome);
+        setExpenses(totalExpenses);
+        setBalance(totalIncome - totalExpenses);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        navigate('/login');
+    };
 
     return (
-        <div className="container mt-4"> {/* Container with top margin */}
-            <div className="row">
-                <div className="col-12">
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                        {/* Flex container to place title and logout button on opposite sides */}
-                        <div>
-                            <h2>Willkommen bei FinTrack</h2>
-                            {/* Display user email */}
-                            {user && user.email && (
-                                <p className="text-muted">Eingeloggt als: <strong>{user.email}</strong></p>
-                            )}
+        <div className="dashboard-wrapper">
+            {/* Top Header */}
+            <div className="dashboard-header">
+                <div className="header-content">
+                    <div className="welcome-section">
+                        <h2>Willkommen zurück!</h2>
+                        <p>{user?.email}</p>
+                    </div>
+                    <button className="logout-btn" onClick={handleLogout}>
+                        <i className="fas fa-sign-out-alt"></i>
+                        <span className="logout-text">Abmelden</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Main Dashboard Content */}
+            <div className="dashboard-content">
+                {/* Stats Cards */}
+                <div className="stats-grid">
+                    <div className="stat-card balance">
+                        <div className="stat-icon">
+                            <i className="fas fa-wallet"></i>
                         </div>
+                        <div className="stat-details">
+                            <h4>Kontostand</h4>
+                            <p className="stat-value">€{balance.toFixed(2)}</p>
+                        </div>
+                    </div>
+
+                    <div className="stat-card income">
+                        <div className="stat-icon">
+                            <i className="fas fa-arrow-up"></i>
+                        </div>
+                        <div className="stat-details">
+                            <h4>Einnahmen</h4>
+                            <p className="stat-value">€{income.toFixed(2)}</p>
+                        </div>
+                    </div>
+
+                    <div className="stat-card expenses">
+                        <div className="stat-icon">
+                            <i className="fas fa-arrow-down"></i>
+                        </div>
+                        <div className="stat-details">
+                            <h4>Ausgaben</h4>
+                            <p className="stat-value">€{expenses.toFixed(2)}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="quick-actions">
+                    <h3>Schnellaktionen</h3>
+                    <div className="actions-grid">
+                        <button
+                            className="action-card"
+                            onClick={() => navigate('/transaction')}
+                        >
+                            <i className="fas fa-plus-circle"></i>
+                            <span>Neue Transaktion</span>
+                        </button>
 
                         <button
-                            className="btn btn-danger" // Red button for logout
-                            onClick={handleLogout}
+                            className="action-card"
+                            onClick={() => navigate('/account-statement')}
                         >
-                            Logout
+                            <i className="fas fa-file-alt"></i>
+                            <span>Kontoauszug</span>
+                        </button>
+
+                        <button
+                            className="action-card"
+                            onClick={() => navigate('/currency-converter')}
+                        >
+                            <i className="fas fa-exchange-alt"></i>
+                            <span>Währungsrechner</span>
                         </button>
                     </div>
-                    <div className="card mb-4">
-                        <div className="card-body">
-                            <h5 className="card-title">Kontoübersicht</h5> {/* Account overview in German */}
-                            <p className="card-text">Aktueller Kontostand: 0,00 €</p> {/* Current balance */}
-                        </div>
+                </div>
+
+                {/* Recent Transactions */}
+                <div className="recent-transactions">
+                    <div className="section-header">
+                        <h3>Letzte Transaktionen</h3>
+                        <button
+                            className="view-all-btn"
+                            onClick={() => navigate('/account-statement')}
+                        >
+                            Alle anzeigen
+                        </button>
                     </div>
-                    <div className="row">
-                        <div className="col-md-6"> {/* Half-width column on medium screens */}
-                            <div className="card mb-4">
-                                <div className="card-body">
-                                    <h5 className="card-title">Letzte Transaktionen</h5> {/* Latest transactions */}
-                                    <p className="card-text">Keine Transaktionen vorhanden</p> {/* No transactions available */}
-                                </div>
-                            </div>
+
+                    {transactions.length === 0 ? (
+                        <div className="empty-state">
+                            <i className="fas fa-inbox"></i>
+                            <p>Keine Transaktionen vorhanden</p>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => navigate('/transaction')}
+                            >
+                                Erste Transaktion hinzufügen
+                            </button>
                         </div>
-                        <div className="col-md-6"> {/* Half-width column on medium screens */}
-                            <div className="card">
-                                <div className="card-body">
-                                    <h5 className="card-title">Schnellaktionen</h5> {/* Quick actions */}
-                                    <button className="btn btn-primary me-2" onClick={handleNewTransaction}>Neue Transaktion</button> {/* New transaction button */}
-                                    <button className="btn btn-secondary" onClick={handleAccountStatement}>Kontoauszug</button> {/* Account statement button */}
+                    ) : (
+                        <div className="transaction-list">
+                            {transactions.map(transaction => (
+                                <div key={transaction._id} className="transaction-item">
+                                    <div className="transaction-info">
+                                        <h5>{transaction.description}</h5>
+                                        <p>{new Date(transaction.date).toLocaleDateString('de-DE')}</p>
+                                    </div>
+                                    <div className={`transaction-amount ${transaction.type}`}>
+                                        {transaction.type === 'income' ? '+' : '-'}€{transaction.amount.toFixed(2)}
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>
     );
 }
 
-export default Dashboard; // Exports Dashboard component
+export default Dashboard;

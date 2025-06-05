@@ -1,10 +1,30 @@
 // frontend/src/components/Navigation.js
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import './Navigation.css';
 
 const Navigation = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const location = useLocation();
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+            if (window.innerWidth >= 768) {
+                setIsOpen(false);
+            }
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        // Close menu on route change
+        setIsOpen(false);
+    }, [location]);
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -16,21 +36,74 @@ const Navigation = () => {
     };
 
     return (
-        <div className="nav-container">
-            <button className="hamburger" onClick={toggleMenu}>
-                <span className="hamburger-line"></span>
-                <span className="hamburger-line"></span>
-                <span className="hamburger-line"></span>
+        <>
+            {/* Mobile Hamburger Button */}
+            <button
+                className={`mobile-menu-toggle ${isOpen ? 'active' : ''}`}
+                onClick={toggleMenu}
+                aria-label="Toggle menu"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
 
+            {/* Overlay for mobile */}
+            {isOpen && isMobile && (
+                <div className="nav-overlay" onClick={toggleMenu}></div>
+            )}
+
+            {/* Navigation Menu */}
             <nav className={`nav-menu ${isOpen ? 'active' : ''}`}>
-                <Link to="/" onClick={toggleMenu}>Dashboard</Link>
-                <Link to="/transaction" onClick={toggleMenu}>Transaktion</Link>
-                <Link to="/account-statement" onClick={toggleMenu}>Kontoauszug</Link>
-                <Link to="/currency-converter" onClick={toggleMenu}>Währungsrechner</Link>
-                <button className="logout-button" onClick={handleLogout}>Abmelden</button>
+                <div className="nav-header">
+                    <h3>FinTrack</h3>
+                    {isMobile && (
+                        <button className="close-menu" onClick={toggleMenu}>
+                            <i className="fas fa-times"></i>
+                        </button>
+                    )}
+                </div>
+
+                <div className="nav-links">
+                    <Link
+                        to="/dashboard"
+                        className={location.pathname === '/dashboard' ? 'active' : ''}
+                    >
+                        <i className="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </Link>
+
+                    <Link
+                        to="/transaction"
+                        className={location.pathname === '/transaction' ? 'active' : ''}
+                    >
+                        <i className="fas fa-plus-circle"></i>
+                        <span>Transaktion</span>
+                    </Link>
+
+                    <Link
+                        to="/account-statement"
+                        className={location.pathname === '/account-statement' ? 'active' : ''}
+                    >
+                        <i className="fas fa-file-alt"></i>
+                        <span>Kontoauszug</span>
+                    </Link>
+
+                    <Link
+                        to="/currency-converter"
+                        className={location.pathname === '/currency-converter' ? 'active' : ''}
+                    >
+                        <i className="fas fa-exchange-alt"></i>
+                        <span>Währungsrechner</span>
+                    </Link>
+                </div>
+
+                <button className="nav-logout-button" onClick={handleLogout}>
+                    <i className="fas fa-sign-out-alt"></i>
+                    <span>Abmelden</span>
+                </button>
             </nav>
-        </div>
+        </>
     );
 };
 
