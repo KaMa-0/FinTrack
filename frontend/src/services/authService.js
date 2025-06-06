@@ -1,5 +1,5 @@
 // src/services/authService.js
-const API_URL = 'http://localhost:5000/api/auth/'; //
+const API_URL = 'http://localhost:5001/api/auth/'; //
 export const authService = {
     // Register a new user
     signUp: async (userData) => {

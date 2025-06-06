@@ -32,7 +32,7 @@ const Navigation = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        window.location.href = '/landing';
     };
 
     return (

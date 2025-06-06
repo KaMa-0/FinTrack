@@ -43,7 +43,7 @@ function Register() {
 
         try {
             // For now, only send email and password to match backend
-            await authService.signUp(formData.email, formData.password);
+            await authService.signUp(formData);
             alert('Registrierung erfolgreich! Bitte melden Sie sich an.');
             navigate('/login');
         } catch (error) {
