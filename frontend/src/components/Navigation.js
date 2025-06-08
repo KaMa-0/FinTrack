@@ -1,4 +1,3 @@
-// frontend/src/components/Navigation.js
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Navigation.css';
@@ -22,7 +21,6 @@ const Navigation = () => {
     }, []);
 
     useEffect(() => {
-        // Close menu on route change
         setIsOpen(false);
     }, [location]);
 
@@ -37,7 +35,6 @@ const Navigation = () => {
 
     return (
         <>
-            {/* Mobile Hamburger Button */}
             <button
                 className={`mobile-menu-toggle ${isOpen ? 'active' : ''}`}
                 onClick={toggleMenu}
@@ -48,12 +45,10 @@ const Navigation = () => {
                 <span></span>
             </button>
 
-            {/* Overlay for mobile */}
             {isOpen && isMobile && (
                 <div className="nav-overlay" onClick={toggleMenu}></div>
             )}
 
-            {/* Navigation Menu */}
             <nav className={`nav-menu ${isOpen ? 'active' : ''}`}>
                 <div className="nav-header">
                     <h3>FinTrack</h3>
@@ -90,6 +85,14 @@ const Navigation = () => {
                     >
                         <i className="fas fa-exchange-alt"></i>
                         <span>Währungsrechner</span>
+                    </Link>
+
+                    <Link
+                        to="/stocks"
+                        className={location.pathname === '/stocks' ? 'active' : ''}
+                    >
+                        <i className="fas fa-chart-line"></i>
+                        <span>Aktien</span>
                     </Link>
                 </div>
 

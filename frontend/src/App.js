@@ -1,4 +1,3 @@
-// frontend/src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
@@ -11,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Transaction from './pages/Transaction';
 import AccountStatement from "./pages/AccountStatement";
 import CurrencyConverter from './pages/CurrencyConverter';
+import StockWatch from './pages/StockWatch';
 import Navigation from './components/Navigation';
 
 const PrivateRoute = ({ children }) => {
@@ -66,9 +66,15 @@ function App() {
                         <CurrencyConverter />
                     </PrivateRoute>
                 } />
+                <Route path="/stocks" element={
+                    <PrivateRoute>
+                        <StockWatch />
+                    </PrivateRoute>
+                } />
             </Routes>
         </Router>
     );
 }
 
 export default App;
+

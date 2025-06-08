@@ -1,4 +1,3 @@
-// frontend/src/pages/Dashboard.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -25,7 +24,7 @@ function Dashboard() {
             });
             if (response.ok) {
                 const data = await response.json();
-                setTransactions(data.slice(0, 5)); // Last 5 transactions
+                setTransactions(data.slice(0, 5));
                 calculateTotals(data);
             }
         } catch (error) {
@@ -57,7 +56,6 @@ function Dashboard() {
 
     return (
         <div className="dashboard-wrapper">
-            {/* Top Header */}
             <div className="dashboard-header">
                 <div className="header-content">
                     <div className="welcome-section">
@@ -71,9 +69,7 @@ function Dashboard() {
                 </div>
             </div>
 
-            {/* Main Dashboard Content */}
             <div className="dashboard-content">
-                {/* Stats Cards */}
                 <div className="stats-grid">
                     <div className="stat-card balance">
                         <div className="stat-icon">
@@ -106,7 +102,6 @@ function Dashboard() {
                     </div>
                 </div>
 
-                {/* Quick Actions */}
                 <div className="quick-actions">
                     <h3>Schnellaktionen</h3>
                     <div className="actions-grid">
@@ -133,10 +128,17 @@ function Dashboard() {
                             <i className="fas fa-exchange-alt"></i>
                             <span>Währungsrechner</span>
                         </button>
+
+                        <button
+                            className="action-card"
+                            onClick={() => navigate('/stocks')}
+                        >
+                            <i className="fas fa-chart-line"></i>
+                            <span>Aktien</span>
+                        </button>
                     </div>
                 </div>
 
-                {/* Recent Transactions */}
                 <div className="recent-transactions">
                     <div className="section-header">
                         <h3>Letzte Transaktionen</h3>
