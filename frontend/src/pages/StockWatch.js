@@ -8,7 +8,7 @@ function StockWatch() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const API_KEY = 'd12pqb9r01qv1k0mgsugd12pqb9r01qv1k0mgsv0';
+    const API_KEY = 'apikey';
 
     useEffect(() => {
         loadWatchlist();
