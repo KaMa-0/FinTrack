@@ -1,5 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import './StockWatch.css';
+import { fetchStockData, getWatchlist, addToWatchlist as apiAddToWatchlist, removeFromWatchlist as apiRemoveFromWatchlist } from '../services/stockApi';
+
+const TEXTS = {
+    TITLE: 'Aktien Watchlist',
+    INPUT_PLACEHOLDER: 'Aktiensymbol eingeben (z.B. AAPL)',
+    LOADING: 'Lädt...',
+    ADD_BUTTON: 'Hinzufügen',
+    PRICE: 'Preis',
+    CHANGE: 'Änderung',
+    LAST_UPDATED: 'Zuletzt aktualisiert',
+    LOADING_DATA: 'Lade Daten...',
+    REMOVE_TITLE: 'Entfernen',
+    ERRORS: {
+        LOAD_WATCHLIST: 'Fehler beim Laden der Watchlist',
+        LOAD_STOCK: (symbol) => `Fehler beim Laden der Daten für ${symbol}`,
+        NO_DATA: 'Keine Daten verfügbar',
+        ALREADY_IN_LIST: 'Diese Aktie ist bereits in der Watchlist',
+        ADD_STOCK: 'Fehler beim Hinzufügen der Aktie',
+        REMOVE_STOCK: 'Fehler beim Entfernen der Aktie'
+    }
+};
 
 function StockWatch() {
     const [watchlist, setWatchlist] = useState([]);
@@ -8,37 +29,27 @@ function StockWatch() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const API_KEY = 'apikey';
-
     useEffect(() => {
         loadWatchlist();
-        const interval = setInterval(loadWatchlist, 300000); // Alle 5 Minuten aktualisieren
+        const interval = setInterval(loadWatchlist, 300000);
         return () => clearInterval(interval);
     }, []);
 
     const loadWatchlist = async () => {
-        const savedWatchlist = localStorage.getItem('watchlist');
-        if (savedWatchlist) {
-            const parsed = JSON.parse(savedWatchlist);
-            setWatchlist(parsed);
-            parsed.forEach(symbol => fetchStockData(symbol));
+        try {
+            const symbols = await getWatchlist();
+            setWatchlist(symbols);
+            symbols.forEach(fetchStockQuote);
+        } catch (err) {
+            setError(TEXTS.ERRORS.LOAD_WATCHLIST);
         }
     };
 
-    const fetchStockData = async (stockSymbol) => {
+    const fetchStockQuote = async (stockSymbol) => {
         try {
             setLoading(true);
             setError('');
-
-            const response = await fetch(
-                `https://finnhub.io/api/v1/quote?symbol=${stockSymbol}&token=${API_KEY}`
-            );
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await fetchStockData(stockSymbol);
 
             if (data.c) {
                 setStockData(prevData => ({
@@ -51,11 +62,10 @@ function StockWatch() {
                     }
                 }));
             } else {
-                throw new Error('Keine Daten verfügbar');
+                throw new Error(TEXTS.ERRORS.NO_DATA);
             }
         } catch (err) {
-            console.error('Fehler beim API-Aufruf:', err);
-            setError(`Fehler beim Laden der Daten für ${stockSymbol}`);
+            setError(TEXTS.ERRORS.LOAD_STOCK(stockSymbol));
         } finally {
             setLoading(false);
         }
@@ -67,49 +77,47 @@ function StockWatch() {
 
         const upperSymbol = symbol.toUpperCase();
         if (watchlist.includes(upperSymbol)) {
-            setError('Diese Aktie ist bereits in der Watchlist');
+            setError(TEXTS.ERRORS.ALREADY_IN_LIST);
             return;
         }
 
         try {
             setLoading(true);
             setError('');
-            await fetchStockData(upperSymbol);
-
-            const newWatchlist = [...watchlist, upperSymbol];
-            setWatchlist(newWatchlist);
-            localStorage.setItem('watchlist', JSON.stringify(newWatchlist));
+            await apiAddToWatchlist(upperSymbol);
+            await fetchStockQuote(upperSymbol);
+            await loadWatchlist();
             setSymbol('');
         } catch (err) {
-            setError('Fehler beim Hinzufügen der Aktie');
-            console.error('Fehler:', err);
+            setError(TEXTS.ERRORS.ADD_STOCK);
         } finally {
             setLoading(false);
         }
     };
 
-    const removeFromWatchlist = (stockSymbol) => {
-        const newWatchlist = watchlist.filter(s => s !== stockSymbol);
-        setWatchlist(newWatchlist);
-        localStorage.setItem('watchlist', JSON.stringify(newWatchlist));
-
-        setStockData(prevData => {
-            const newData = { ...prevData };
-            delete newData[stockSymbol];
-            return newData;
-        });
+    const removeFromWatchlist = async (stockSymbol) => {
+        try {
+            await apiRemoveFromWatchlist(stockSymbol);
+            setWatchlist(prevList => prevList.filter(s => s !== stockSymbol));
+            setStockData(prevData => {
+                const newData = { ...prevData };
+                delete newData[stockSymbol];
+                return newData;
+            });
+        } catch (err) {
+            setError(TEXTS.ERRORS.REMOVE_STOCK);
+        }
     };
-
     return (
         <div className="stock-watch-container">
             <div className="stock-watch-header">
-                <h2>Aktien Watchlist</h2>
+                <h2>{TEXTS.TITLE}</h2>
                 <form onSubmit={addToWatchlist} className="add-stock-form">
                     <input
                         type="text"
                         value={symbol}
                         onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-                        placeholder="Aktiensymbol eingeben (z.B. AAPL)"
+                        placeholder={TEXTS.INPUT_PLACEHOLDER}
                         className="stock-input"
                         disabled={loading}
                     />
@@ -118,7 +126,7 @@ function StockWatch() {
                         className="add-button"
                         disabled={loading || !symbol}
                     >
-                        {loading ? 'Lädt...' : 'Hinzufügen'}
+                        {loading ? TEXTS.LOADING : TEXTS.ADD_BUTTON}
                     </button>
                 </form>
             </div>
@@ -133,22 +141,22 @@ function StockWatch() {
                             <button
                                 onClick={() => removeFromWatchlist(stock)}
                                 className="remove-button"
-                                title="Entfernen"
+                                title={TEXTS.REMOVE_TITLE}
                             >
                                 ×
                             </button>
                         </div>
                         {stockData[stock] ? (
                             <div className="stock-info">
-                                <p>Preis: ${parseFloat(stockData[stock].price).toFixed(2)}</p>
+                                <p>{TEXTS.PRICE}: ${parseFloat(stockData[stock].price).toFixed(2)}</p>
                                 <p className={parseFloat(stockData[stock].change) >= 0 ? 'positive' : 'negative'}>
-                                    Änderung: ${parseFloat(stockData[stock].change).toFixed(2)}
+                                    {TEXTS.CHANGE}: ${parseFloat(stockData[stock].change).toFixed(2)}
                                     ({stockData[stock].changePercent}%)
                                 </p>
-                                <small>Zuletzt aktualisiert: {stockData[stock].lastUpdated}</small>
+                                <small>{TEXTS.LAST_UPDATED}: {stockData[stock].lastUpdated}</small>
                             </div>
                         ) : (
-                            <p className="loading">Lade Daten...</p>
+                            <p className="loading">{TEXTS.LOADING_DATA}</p>
                         )}
                     </div>
                 ))}
