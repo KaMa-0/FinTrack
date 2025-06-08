@@ -1,11 +1,70 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
+const { ObjectId } = require('mongodb');
+const WatchList = require('../models/WatchList');
 
 const API_KEY = process.env.FINNHUB_API_KEY;
 const cache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 Minuten
+const CACHE_DURATION = 5 * 60 * 1000;
 
-router.get('/api/stocks/:symbol', async (req, res) => {
+// GET Watchlist
+router.get('/watchlist', auth.verifyToken, async (req, res) => {
+    try {
+        const userId = new ObjectId(req.userId);
+        const watchlist = await WatchList.findOne({ userId: userId });
+        res.json(watchlist?.symbols || []);
+    } catch (error) {
+        res.status(500).json({ error: 'Fehler beim Abrufen der Watchlist' });
+    }
+});
+
+// POST zur Watchlist hinzufügen
+router.post('/watchlist', auth.verifyToken, async (req, res) => {
+    try {
+        const { symbol } = req.body;
+        const userId = new ObjectId(req.userId);
+
+        if (!symbol) {
+            return res.status(400).json({ error: 'Symbol ist erforderlich' });
+        }
+
+        await WatchList.findOneAndUpdate(
+            { userId: userId },
+            { $addToSet: { symbols: symbol } },
+            { upsert: true, new: true }
+        );
+
+        res.json({ success: true, message: 'Symbol zur Watchlist hinzugefügt' });
+    } catch (error) {
+        res.status(500).json({ error: 'Fehler beim Aktualisieren der Watchlist' });
+    }
+});
+
+// DELETE von Watchlist entfernen
+router.delete('/watchlist/:symbol', auth.verifyToken, async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const userId = new ObjectId(req.userId);
+
+        const result = await WatchList.findOneAndUpdate(
+            { userId: userId },
+            { $pull: { symbols: symbol } },
+            { new: true }
+        );
+
+        if (!result) {
+            return res.status(404).json({ error: 'Watchlist nicht gefunden' });
+        }
+
+        res.json({ success: true, message: 'Symbol von Watchlist entfernt' });
+    } catch (error) {
+        res.status(500).json({ error: 'Fehler beim Entfernen aus der Watchlist' });
+    }
+});
+
+// GET einzelne Aktie (unverändert)
+router.get('/:symbol', auth.verifyToken, async (req, res) => {
     try {
         const { symbol } = req.params;
         const cached = cache.get(symbol);
@@ -17,8 +76,12 @@ router.get('/api/stocks/:symbol', async (req, res) => {
         const response = await fetch(
             `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`
         );
-        const data = await response.json();
 
+        if (!response.ok) {
+            throw new Error('Fehler beim Abrufen der Aktieninformationen');
+        }
+
+        const data = await response.json();
         cache.set(symbol, {
             timestamp: Date.now(),
             data: data
@@ -30,22 +93,4 @@ router.get('/api/stocks/:symbol', async (req, res) => {
     }
 });
 
-router.get('/api/watchlist', async (req, res) => {
-    // TODO: Benutzer-ID aus Session/Token
-    const userId = req.user.id;
-    const watchlist = await WatchList.findOne({ userId });
-    res.json(watchlist.symbols);
-});
-
-router.post('/api/watchlist', async (req, res) => {
-    const { symbol } = req.body;
-    const userId = req.user.id;
-
-    await WatchList.findOneAndUpdate(
-        { userId },
-        { $addToSet: { symbols: symbol } },
-        { upsert: true }
-    );
-
-    res.json({ success: true });
-});
+module.exports = router;
