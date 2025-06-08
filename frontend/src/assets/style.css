@@ -22,6 +22,7 @@ body {
 /* Login & Register Specific Styles */
 .auth-container {
     min-height: 100vh;
+    background-image: url('./login-background.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

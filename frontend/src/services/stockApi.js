@@ -1,4 +1,4 @@
-const API_KEY = 'd12rsp9r01qv1k0mslugd12rsp9r01qv1k0mslv0';
+const API_KEY = 'apikey';
 const BASE_URL = 'https://finnhub.io/api/v1';
 
 export const fetchStockData = async (symbol) => {
