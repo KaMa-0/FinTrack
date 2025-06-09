@@ -5,15 +5,20 @@ Financial Tracking Tool
 ```
 FinTrack/
 ├── README.md
-├── backend             # Backend components
+├── backend             ### Backend components ###
 │   └── src             
 │       ├── controllers # Controllers and logic components
-│       └── models      # Models and Objects
+│       ├── middleware  # Authentication
+│       ├── models      # Models and Objects
+│       └── routes      # Public and Private Routings
+│       
 ├── docs                # Project Documentation, Notes, etc.
-└── frontend            # Frontend components
+│       
+└── frontend            ### Frontend components ###
     ├── public          # Static Assets
     └── src
         ├── assets      # Dynamic Assets
+        ├── components  # Global Components 
         ├── pages       # Webpages, Screens
         └── services    # API/Backend calls
 ```

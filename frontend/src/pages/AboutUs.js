@@ -13,8 +13,6 @@ function AboutUs() {
                     <div className="nav-links">
                         <Link to="/">Startseite</Link>
                         <Link to="/about" className="active">Über uns</Link>
-                        <Link to="/gallery">Galerie</Link>
-                        <Link to="/contact">Kontakt</Link>
                         <Link to="/login" className="btn-login">Anmelden</Link>
                     </div>
                 </div>
@@ -24,18 +22,14 @@ function AboutUs() {
                 <div className="container">
                     <h1>Über uns</h1>
                     <div className="about-section">
-                        <h2>Unsere Mission</h2>
-                        <p>FinTrack wurde entwickelt, um Menschen dabei zu helfen, ihre Finanzen einfach und effizient zu verwalten. Wir glauben, dass jeder die Kontrolle über seine finanzielle Zukunft haben sollte.</p>
+                        <h2>FH Projekt SS 2025</h2>
+                        <p>FinTrack wurde im Rahmen der Projektarbeit in WEBTECH entwickelt. Primärer Zweck des Projektes ist das Lernen und Üben im Umgang mit Web-Technologies, erstellen von FrontEnd (FE) und BackEnd (BE) Komponenten und Koordination der Kommunikation zwischen den Komponenten. All das, in einer Art und Weise, die den gegebenen Requirements der Projektarbeit entsprechen.</p>
 
                         <h2>Unser Team</h2>
-                        <p>Wir sind ein engagiertes Team von Entwicklern und Finanzexperten, die gemeinsam an der besten Lösung für Ihre Finanzverwaltung arbeiten.</p>
-
-                        <h2>Unsere Werte</h2>
                         <ul>
-                            <li><strong>Transparenz:</strong> Klare und verständliche Finanzübersichten</li>
-                            <li><strong>Sicherheit:</strong> Ihre Daten sind bei uns sicher</li>
-                            <li><strong>Benutzerfreundlichkeit:</strong> Einfache Bedienung für jedermann</li>
-                            <li><strong>Innovation:</strong> Stetige Weiterentwicklung unserer Dienste</li>
+                            <li><strong>Annas-Daud Sheikh</strong> <a href="mailto:annas-daud.sheikh@stud.fh-campuswien.ac.at">Send Mail.</a></li>
+                            <li><strong>Maid Kanuric</strong> <a href="mailto:maid.kanuric@stud.fh-campuswien.ac.at">Send Mail.</a></li>
+                            <li><strong>Zafer Sarioglu</strong> <a href="mailto:zafer.sarioglu@stud.fh-campuswien.ac.at">Send Mail.</a></li>
                         </ul>
                     </div>
                 </div>

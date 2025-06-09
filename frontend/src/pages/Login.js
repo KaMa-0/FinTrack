@@ -35,8 +35,6 @@ function Login() {
                     <div className="nav-links">
                         <Link to="/">Startseite</Link>
                         <Link to="/about">Über uns</Link>
-                        <Link to="/gallery">Galerie</Link>
-                        <Link to="/contact">Kontakt</Link>
                         <Link to="/register" className="btn-register">Registrieren</Link>
                     </div>
                 </div>
