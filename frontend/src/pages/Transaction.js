@@ -247,7 +247,9 @@ function Transaction() {
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {transactions.map(transaction => (
+                                        {transactions
+					    .sort((a, b) => new Date(b.date) - new Date(a.date))
+					    .map(transaction => (
                                             <tr key={transaction._id}>
                                                 <td>{new Date(transaction.date).toLocaleDateString('de-DE')}</td>
                                                 <td>{transaction.description}</td>
