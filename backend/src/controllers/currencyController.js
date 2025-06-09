@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { validationResult } = require('express-validator');
 
+// M5_req::start [HTTP endpoint returning data as JSON]
 exports.convertCurrency = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -16,7 +17,7 @@ exports.convertCurrency = async (req, res) => {
         const rate = response.data.rates[toCurrency];
         const result = (parseFloat(amount) * rate).toFixed(2);
 
-        res.json({
+        res.json({ // M5_req -> data returned as JSON for GET call
             amount: parseFloat(amount),
             fromCurrency,
             toCurrency,
@@ -27,3 +28,5 @@ exports.convertCurrency = async (req, res) => {
         res.status(500).json({ error: 'Währungsumrechnung fehlgeschlagen' });
     }
 };
+
+// M5_req::end
