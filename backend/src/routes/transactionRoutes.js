@@ -3,6 +3,9 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const transactionController = require('../controllers/transactionController');
 
+// M3_req::start [routing of API call to backend implementation]
+// (see first actual code line)
+
 /**
  * @swagger
  * components:
@@ -101,6 +104,7 @@ const transactionController = require('../controllers/transactionController');
  *         description: Server error
  */
 router.get('/', auth.verifyToken, transactionController.getTransactions);
+// M3_req -> Routing for GET method, linking to getTransactions function in backend
 
 /**
  * @swagger
@@ -171,6 +175,7 @@ router.post('/', auth.verifyToken, transactionController.createTransaction);
  *         description: Server error
  */
 router.put('/:id', auth.verifyToken, transactionController.updateTransaction);
+// M3_req -> Routing for PUT method, linking to updateTransactions function in backend
 
 /**
  * @swagger
@@ -232,6 +237,7 @@ router.put('/:id', auth.verifyToken, transactionController.updateTransaction);
  *         description: Server error
  */
 router.patch('/:id', auth.verifyToken, transactionController.patchTransaction);
+// M3_req -> Routing for PATCH method, linking to patchTransactions function in backend
 
 /**
  * @swagger
@@ -268,5 +274,8 @@ router.patch('/:id', auth.verifyToken, transactionController.patchTransaction);
  *         description: Server error
  */
 router.delete('/:id', auth.verifyToken, transactionController.deleteTransaction);
+// M3_req -> Routing for DELETE method, linking to deleteTransactions function in backend
+
+// M3_req::end
 
 module.exports = router;
