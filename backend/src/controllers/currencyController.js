@@ -1,4 +1,3 @@
-// backend/controllers/currencyController.js
 const axios = require('axios');
 const { validationResult } = require('express-validator');
 
