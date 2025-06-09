@@ -40,16 +40,12 @@ function AdminPanel() {
     };
 
     const handleDeleteUser = async (userId, userEmail) => {
-        if (window.confirm(`Sind Sie sicher, dass Sie den Benutzer ${userEmail} und alle seine Daten endgültig löschen möchten?`)) {
+        if (window.confirm(`Sind Sie sicher, dass Sie den Benutzer ${userEmail} löschen möchten?`)) {
             try {
                 const result = await AdminService.deleteUser(currentUser.token, userId);
                 alert(result.message);
 
-                // --- KORREKTUR HIER ---
-                // 1. Benutzer aus der Liste entfernen
                 setUsers(users.filter(u => u._id !== userId));
-
-                // 2. Statistiken aktualisieren
                 setStats(prevStats => ({
                     ...prevStats,
                     totalUsers: prevStats.totalUsers - 1,
@@ -68,21 +64,22 @@ function AdminPanel() {
         <div className="admin-panel-container">
             <h1>Admin Panel</h1>
 
+            {/* System Statistics */}
             <div className="admin-section">
                 <h2>Systemstatistiken</h2>
                 <div className="stats-grid">
                     <div className="stat-card">
-                        <h4>Benutzer gesamt</h4>
-                        {/* Die Anzeige bleibt gleich, wird aber durch den State aktualisiert */}
-                        <p>{stats.totalUsers}</p>
+                        <h4>Gesamte Benutzer</h4>
+                        <p>{stats.totalUsers || 0}</p>
                     </div>
                     <div className="stat-card">
-                        <h4>Transaktionen gesamt</h4>
-                        <p>{stats.totalTransactions}</p>
+                        <h4>Gesamte Transaktionen</h4>
+                        <p>{stats.totalTransactions || 0}</p>
                     </div>
                 </div>
             </div>
 
+            {/* User Management */}
             <div className="admin-section">
                 <h2>Benutzerverwaltung</h2>
                 <div className="table-responsive">
@@ -90,35 +87,35 @@ function AdminPanel() {
                         <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Email</th>
+                            <th>E-Mail</th>
                             <th>Status</th>
                             <th>Admin</th>
                             <th>Aktionen</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {users.map(u => (
-                            <tr key={u._id}>
-                                <td>{u.firstName} {u.lastName}</td>
-                                <td>{u.email}</td>
+                        {users.map(user => (
+                            <tr key={user._id}>
+                                <td>{user.firstName} {user.lastName}</td>
+                                <td>{user.email}</td>
                                 <td>
-                                        <span className={u.isLocked ? 'status-locked' : 'status-active'}>
-                                            {u.isLocked ? 'Gesperrt' : 'Aktiv'}
+                                        <span className={user.isLocked ? 'status-locked' : 'status-active'}>
+                                            {user.isLocked ? 'Gesperrt' : 'Aktiv'}
                                         </span>
                                 </td>
-                                <td>{u.isAdmin ? 'Ja' : 'Nein'}</td>
+                                <td>{user.isAdmin ? 'Ja' : 'Nein'}</td>
                                 <td>
                                     <button
-                                        className={`btn btn-sm ${u.isLocked ? 'btn-success' : 'btn-warning'}`}
-                                        onClick={() => handleLockUser(u._id)}
-                                        disabled={u.email === currentUser.email}
+                                        className={`btn btn-sm ${user.isLocked ? 'btn-success' : 'btn-warning'}`}
+                                        onClick={() => handleLockUser(user._id)}
+                                        disabled={user.email === currentUser.email}
                                     >
-                                        {u.isLocked ? 'Entsperren' : 'Sperren'}
+                                        {user.isLocked ? 'Entsperren' : 'Sperren'}
                                     </button>
                                     <button
-                                        className="btn btn-sm btn-danger ms-2"
-                                        onClick={() => handleDeleteUser(u._id, u.email)}
-                                        disabled={u.email === currentUser.email}
+                                        className="btn btn-sm btn-danger"
+                                        onClick={() => handleDeleteUser(user._id, user.email)}
+                                        disabled={user.email === currentUser.email}
                                     >
                                         Löschen
                                     </button>
