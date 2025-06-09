@@ -1,7 +1,8 @@
 const Transaction = require('../models/Transaction');
 
+// M4_req::start [AJAX communication/implementation of BE component]
 // GET - All transactions
-exports.getTransactions = async (req, res) => {
+exports.getTransactions = async (req, res) => { // M4_req -> AJAX implementation 
     try {
         const transactions = await Transaction.find({ userId: req.userId });
         res.json(transactions);
@@ -11,7 +12,7 @@ exports.getTransactions = async (req, res) => {
 };
 
 // POST - Create transaction
-exports.createTransaction = async (req, res) => {
+exports.createTransaction = async (req, res) => { // M4_req -> AJAX implementation 
     try {
         const transaction = await Transaction.create({
             ...req.body,
@@ -24,7 +25,7 @@ exports.createTransaction = async (req, res) => {
 };
 
 // PUT - Update transaction
-exports.updateTransaction = async (req, res) => {
+exports.updateTransaction = async (req, res) => { // M4_req -> AJAX implementation 
     try {
         const transaction = await Transaction.findOneAndUpdate(
             { _id: req.params.id, userId: req.userId },
@@ -41,7 +42,7 @@ exports.updateTransaction = async (req, res) => {
 };
 
 // PATCH - Partially update transaction
-exports.patchTransaction = async (req, res) => {
+exports.patchTransaction = async (req, res) => { // M4_req -> AJAX implementation 
     try {
         const transaction = await Transaction.findOneAndUpdate(
             { _id: req.params.id, userId: req.userId },
@@ -58,7 +59,7 @@ exports.patchTransaction = async (req, res) => {
 };
 
 // DELETE - Delete transaction
-exports.deleteTransaction = async (req, res) => {
+exports.deleteTransaction = async (req, res) => { // M4_req -> AJAX implementation 
     try {
         const transaction = await Transaction.findOneAndDelete({
             _id: req.params.id,
@@ -72,3 +73,5 @@ exports.deleteTransaction = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// M4_req::end 
