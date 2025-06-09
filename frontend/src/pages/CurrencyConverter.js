@@ -1,4 +1,3 @@
-// frontend/src/pages/CurrencyConverter.js
 import React, { useState } from 'react';
 import './CurrencyConverter.css';
 

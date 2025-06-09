@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 function AccountStatement() {
     const navigate = useNavigate();
@@ -36,7 +35,7 @@ function AccountStatement() {
                 <div className="card-header d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">Kontoauszug</h5>
                     <button
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/dashboard')}
                         className="btn btn-sm btn-outline-secondary"
                     >
                         Zurück

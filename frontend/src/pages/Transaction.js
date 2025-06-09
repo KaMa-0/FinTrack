@@ -1,7 +1,6 @@
-// frontend/src/pages/Transaction.js - Enhanced with CRUD operations
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { TransactionService } from '../services/transactionService';
 
 function Transaction() {
     const [amount, setAmount] = useState('');
@@ -16,28 +15,24 @@ function Transaction() {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
-    // GET - Fetch all transactions
+    // Neuer useEffect Hook für automatisches Laden
+    useEffect(() => {
+        if (user && user.token) {
+            fetchTransactions();
+        } else {
+            navigate('/login');
+        }
+    }, []);
+    // This function is called to fetch data when the component loads.
     const fetchTransactions = async () => {
         try {
-            const response = await fetch('http://localhost:5001/api/transactions', {
-                headers: {
-                    'Authorization': `Bearer ${user.token}`
-                }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setTransactions(data);
-            }
+            const data = await TransactionService.fetchAll(user.token);
+            setTransactions(data);
         } catch (error) {
             console.error('Error fetching transactions:', error);
         }
     };
 
-    useEffect(() => {
-        fetchTransactions();
-    }, []);
-
-    // POST or PUT - Submit form
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -51,26 +46,14 @@ function Transaction() {
         };
 
         try {
-            const url = editingId
-                ? `http://localhost:5001/api/transactions/${editingId}`
-                : 'http://localhost:5001/api/transactions';
-
-            const method = editingId ? 'PUT' : 'POST';
-
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user.token}`
-                },
-                body: JSON.stringify(transaction)
-            });
-
-            if (response.ok) {
-                alert(editingId ? 'Transaktion aktualisiert!' : 'Transaktion hinzugefügt!');
-                resetForm();
-                fetchTransactions();
+            if (editingId) {
+                await TransactionService.update(user.token, editingId, transaction);
+            } else {
+                await TransactionService.create(user.token, transaction);
             }
+            alert(editingId ? 'Transaktion aktualisiert!' : 'Transaktion hinzugefügt!');
+            resetForm();
+            fetchTransactions();
         } catch (error) {
             console.error('Error saving transaction:', error);
         } finally {
@@ -78,28 +61,18 @@ function Transaction() {
         }
     };
 
-    // DELETE - Delete transaction
     const handleDelete = async (id) => {
         if (window.confirm('Diese Transaktion wirklich löschen?')) {
             try {
-                const response = await fetch(`http://localhost:5001/api/transactions/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`
-                    }
-                });
-
-                if (response.ok) {
-                    alert('Transaktion gelöscht!');
-                    fetchTransactions();
-                }
+                await TransactionService.delete(user.token, id);
+                alert('Transaktion gelöscht!');
+                fetchTransactions();
             } catch (error) {
                 console.error('Error deleting transaction:', error);
             }
         }
     };
 
-    // Edit transaction
     const handleEdit = (transaction) => {
         setAmount(transaction.amount);
         setDescription(transaction.description);
@@ -118,6 +91,18 @@ function Transaction() {
         setEditingId(null);
     };
 
+    const handleAmountUpdate = async (transaction) => {
+        const newAmount = prompt('Neuer Betrag:', transaction.amount);
+        if (newAmount) {
+            try {
+                await TransactionService.updateAmount(user.token, transaction._id, parseFloat(newAmount));
+                fetchTransactions();
+            } catch (error) {
+                console.error('Error updating amount:', error);
+            }
+        }
+    };
+
     return (
         <div className="container mt-4">
             <div className="row">
@@ -128,7 +113,7 @@ function Transaction() {
                                 {editingId ? 'Transaktion bearbeiten' : 'Neue Transaktion'}
                             </h5>
                             <button
-                                onClick={() => navigate('/')}
+                                onClick={() => navigate('/dashboard')}
                                 className="btn btn-sm btn-outline-secondary"
                             >
                                 Zurück
@@ -275,6 +260,12 @@ function Transaction() {
                                                         onClick={() => handleEdit(transaction)}
                                                     >
                                                         <i className="fas fa-edit"></i>
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-outline-warning me-1"
+                                                        onClick={() => handleAmountUpdate(transaction)}
+                                                    >
+                                                        <i className="fas fa-coins"></i>
                                                     </button>
                                                     <button
                                                         className="btn btn-sm btn-outline-danger"
