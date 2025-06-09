@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './StockWatch.css';
-import { fetchStockData, getWatchlist, addToWatchlist as apiAddToWatchlist, removeFromWatchlist as apiRemoveFromWatchlist } from '../services/stockApi';
+import { StockService } from '../services/stockService';
 
 const TEXTS = {
     TITLE: 'Aktien Watchlist',
@@ -28,6 +28,7 @@ function StockWatch() {
     const [stockData, setStockData] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const user = JSON.parse(localStorage.getItem('user')); // Retrieve stored user info
 
     useEffect(() => {
         loadWatchlist();
@@ -37,7 +38,8 @@ function StockWatch() {
 
     const loadWatchlist = async () => {
         try {
-            const symbols = await getWatchlist();
+            setError('');
+            const symbols = await StockService.getWatchlist(user.token);
             setWatchlist(symbols);
             symbols.forEach(fetchStockQuote);
         } catch (err) {
@@ -49,7 +51,7 @@ function StockWatch() {
         try {
             setLoading(true);
             setError('');
-            const data = await fetchStockData(stockSymbol);
+            const data = await StockService.fetchStockData(user.token, stockSymbol);
 
             if (data.c) {
                 setStockData(prevData => ({
@@ -84,7 +86,7 @@ function StockWatch() {
         try {
             setLoading(true);
             setError('');
-            await apiAddToWatchlist(upperSymbol);
+            await StockService.addToWatchlist(user.token, upperSymbol);
             await fetchStockQuote(upperSymbol);
             await loadWatchlist();
             setSymbol('');
@@ -97,7 +99,7 @@ function StockWatch() {
 
     const removeFromWatchlist = async (stockSymbol) => {
         try {
-            await apiRemoveFromWatchlist(stockSymbol);
+            await StockService.removeFromWatchlist(user.token, stockSymbol);
             setWatchlist(prevList => prevList.filter(s => s !== stockSymbol));
             setStockData(prevData => {
                 const newData = { ...prevData };
@@ -108,6 +110,7 @@ function StockWatch() {
             setError(TEXTS.ERRORS.REMOVE_STOCK);
         }
     };
+
     return (
         <div className="stock-watch-container">
             <div className="stock-watch-header">
@@ -166,3 +169,4 @@ function StockWatch() {
 }
 
 export default StockWatch;
+
