@@ -27,6 +27,7 @@ app.use('/api/auth', require('./src/routes/auth'));
 app.use('/api/currency', require('./src/routes/currencyRoutes'));
 app.use('/api/transactions', require('./src/routes/transactionRoutes'));
 app.use('/api/stocks', require('./src/routes/stockRoutes'));
+app.use('/api/admin', require('./src/routes/adminRoutes'));
 
 // Root-Route
 app.get('/', (req, res) => {

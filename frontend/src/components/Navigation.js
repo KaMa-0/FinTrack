@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Navigation.css';
-import {authService} from "../services/authService";
+import { authService } from '../services/authService';
 
 const Navigation = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -33,6 +33,9 @@ const Navigation = () => {
         authService.logout();
         window.location.href = '/landing';
     };
+
+    const user = authService.getCurrentUser();
+    const isAdmin = user?.email === 'admin@fintrack.com';
 
     return (
         <>
@@ -95,6 +98,16 @@ const Navigation = () => {
                         <i className="fas fa-chart-line"></i>
                         <span>Aktien</span>
                     </Link>
+
+                    {isAdmin && (
+                        <Link
+                            to="/admin"
+                            className={location.pathname === '/admin' ? 'active' : ''}
+                        >
+                            <i className="fas fa-user-shield"></i>
+                            <span>Admin Panel</span>
+                        </Link>
+                    )}
                 </div>
 
                 <button className="nav-logout-button" onClick={handleLogout}>

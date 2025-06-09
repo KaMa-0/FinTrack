@@ -1,3 +1,5 @@
+// fintrack/backend/src/models/User.js
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -11,6 +13,8 @@ const userSchema = new mongoose.Schema({
     address: { type: String },
     city: { type: String },
     postalCode: { type: String },
+    isAdmin: { type: Boolean, default: false },
+    isLocked: { type: Boolean, default: false }, // <-- NEUES FELD
     createdAt: { type: Date, default: Date.now }
 });
 
