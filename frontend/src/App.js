@@ -15,10 +15,15 @@ import Navigation from './components/Navigation';
 import AdminPanel from './pages/AdminPanel';
 
 const PrivateRoute = ({ children }) => {
-    const isAuthenticated = localStorage.getItem('user') !== null;
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return <Navigate to="/login" />;
 
-    if (!isAuthenticated) {
-        return <Navigate to="/login" />;
+    const user = JSON.parse(userStr);
+    const isAdmin = user.email === 'admin@fintrack.com';
+
+    // Redirect admin to admin panel
+    if (isAdmin) {
+        return <Navigate to="/admin" />;
     }
 
     return (
@@ -36,9 +41,7 @@ const AdminRoute = ({ children }) => {
     if (!userStr) return <Navigate to="/login" />;
 
     const user = JSON.parse(userStr);
-    // In a real app, the user object from the backend would contain an `isAdmin` flag.
-    const isAdmin = user.email === 'admin@fintrack.com'; // Beispiel-Admin-Check
-
+    const isAdmin = user.email === 'admin@fintrack.com';
 
     if (!isAdmin) {
         return <Navigate to="/dashboard" />;
@@ -55,13 +58,21 @@ const AdminRoute = ({ children }) => {
 };
 
 function App() {
-    const isAuthenticated = localStorage.getItem('user') !== null;
+    const userStr = localStorage.getItem('user');
+    const isAuthenticated = userStr !== null;
+    const isAdmin = userStr ? JSON.parse(userStr).email === 'admin@fintrack.com' : false;
 
     return (
         <Router>
             <Routes>
                 {/* Public Routes */}
-                <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />} />
+                <Route path="/" element={
+                    isAuthenticated
+                        ? isAdmin
+                            ? <Navigate to="/admin" />
+                            : <Navigate to="/dashboard" />
+                        : <LandingPage />
+                } />
                 <Route path="/landing" element={<LandingPage />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/gallery" element={<Gallery />} />
@@ -69,7 +80,14 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
 
-                {/* Private Routes */}
+                {/* Admin Routes */}
+                <Route path="/admin" element={
+                    <AdminRoute>
+                        <AdminPanel />
+                    </AdminRoute>
+                } />
+
+                {/* Private Routes - Normal users only */}
                 <Route path="/dashboard" element={
                     <PrivateRoute>
                         <Dashboard />
@@ -94,13 +112,6 @@ function App() {
                     <PrivateRoute>
                         <StockWatch />
                     </PrivateRoute>
-                } />
-
-                {/* Private Admin Route */}
-                <Route path="/admin" element={
-                    <AdminRoute>
-                        <AdminPanel />
-                    </AdminRoute>
                 } />
             </Routes>
         </Router>

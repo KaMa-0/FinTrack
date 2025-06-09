@@ -37,6 +37,37 @@ const Navigation = () => {
     const user = authService.getCurrentUser();
     const isAdmin = user?.email === 'admin@fintrack.com';
 
+    // Admin: only logout button
+    if (isAdmin) {
+        return (
+            <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 1000 }}>
+                <button
+                    onClick={handleLogout}
+                    style={{
+                        background: '#e74c3c',
+                        color: 'white',
+                        border: 'none',
+                        padding: '10px 20px',
+                        borderRadius: '25px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        transition: 'background 0.3s'
+                    }}
+                    onMouseOver={(e) => e.target.style.background = '#c0392b'}
+                    onMouseOut={(e) => e.target.style.background = '#e74c3c'}
+                >
+                    <i className="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        );
+    }
+
+    // Regular users: full navigation
     return (
         <div>
             <button
@@ -72,7 +103,7 @@ const Navigation = () => {
                         className={location.pathname === '/transaction' ? 'active' : ''}
                     >
                         <i className="fas fa-plus-circle"></i>
-                        <span>Transaktion</span>
+                        <span>Transaction</span>
                     </Link>
 
                     <Link
@@ -80,7 +111,7 @@ const Navigation = () => {
                         className={location.pathname === '/account-statement' ? 'active' : ''}
                     >
                         <i className="fas fa-file-alt"></i>
-                        <span>Kontoauszug</span>
+                        <span>Account Statement</span>
                     </Link>
 
                     <Link
@@ -88,7 +119,7 @@ const Navigation = () => {
                         className={location.pathname === '/currency-converter' ? 'active' : ''}
                     >
                         <i className="fas fa-exchange-alt"></i>
-                        <span>Währungsrechner</span>
+                        <span>Currency Converter</span>
                     </Link>
 
                     <Link
@@ -96,23 +127,13 @@ const Navigation = () => {
                         className={location.pathname === '/stocks' ? 'active' : ''}
                     >
                         <i className="fas fa-chart-line"></i>
-                        <span>Aktien</span>
+                        <span>Stocks</span>
                     </Link>
-
-                    {isAdmin && (
-                        <Link
-                            to="/admin"
-                            className={location.pathname === '/admin' ? 'active' : ''}
-                        >
-                            <i className="fas fa-user-shield"></i>
-                            <span>Admin Panel</span>
-                        </Link>
-                    )}
                 </div>
 
                 <button className="nav-logout-button" onClick={handleLogout}>
                     <i className="fas fa-sign-out-alt"></i>
-                    <span>Abmelden</span>
+                    <span>Logout</span>
                 </button>
             </nav>
         </div>
