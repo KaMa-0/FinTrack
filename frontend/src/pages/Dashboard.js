@@ -163,7 +163,9 @@ function Dashboard() {
                         </div>
                     ) : (
                         <div className="transaction-list">
-                            {transactions.map(transaction => (
+                            {transactions
+				.sort((a, b) => new Date(b.date) - new Date(a.date))
+				.map(transaction => (
                                 <div key={transaction._id} className="transaction-item">
                                     <div className="transaction-info">
                                         <h5>{transaction.description}</h5>
