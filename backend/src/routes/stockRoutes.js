@@ -8,7 +8,61 @@ const API_KEY = process.env.FINNHUB_API_KEY;
 const cache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000;
 
-// GET Watchlist
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     WatchlistResponse:
+ *       type: array
+ *       items:
+ *         type: string
+ *       example: ["AAPL", "TSLA", "GOOGL"]
+ *     StockData:
+ *       type: object
+ *       properties:
+ *         c:
+ *           type: number
+ *           description: Current price
+ *         d:
+ *           type: number
+ *           description: Change
+ *         dp:
+ *           type: number
+ *           description: Percent change
+ *         h:
+ *           type: number
+ *           description: High price of the day
+ *         l:
+ *           type: number
+ *           description: Low price of the day
+ *         o:
+ *           type: number
+ *           description: Open price of the day
+ *         pc:
+ *           type: number
+ *           description: Previous close price
+ */
+
+/**
+ * @swagger
+ * /api/stocks/watchlist:
+ *   get:
+ *     summary: Get user's stock watchlist
+ *     tags: [Stocks]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User's watchlist
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/WatchlistResponse'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
 router.get('/watchlist', auth.verifyToken, async (req, res) => {
     try {
         const userId = new ObjectId(req.userId);
@@ -19,7 +73,46 @@ router.get('/watchlist', auth.verifyToken, async (req, res) => {
     }
 });
 
-// POST zur Watchlist hinzufügen
+/**
+ * @swagger
+ * /api/stocks/watchlist:
+ *   post:
+ *     summary: Add stock symbol to watchlist
+ *     tags: [Stocks]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - symbol
+ *             properties:
+ *               symbol:
+ *                 type: string
+ *                 description: Stock symbol to add
+ *                 example: "AAPL"
+ *     responses:
+ *       200:
+ *         description: Symbol added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Symbol is required
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
 router.post('/watchlist', auth.verifyToken, async (req, res) => {
     try {
         const { symbol } = req.body;
@@ -41,7 +134,41 @@ router.post('/watchlist', auth.verifyToken, async (req, res) => {
     }
 });
 
-// DELETE von Watchlist entfernen
+/**
+ * @swagger
+ * /api/stocks/watchlist/{symbol}:
+ *   delete:
+ *     summary: Remove stock symbol from watchlist
+ *     tags: [Stocks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: symbol
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Stock symbol to remove
+ *         example: "AAPL"
+ *     responses:
+ *       200:
+ *         description: Symbol removed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Watchlist not found
+ *       500:
+ *         description: Server error
+ */
 router.delete('/watchlist/:symbol', auth.verifyToken, async (req, res) => {
     try {
         const { symbol } = req.params;
@@ -63,7 +190,34 @@ router.delete('/watchlist/:symbol', auth.verifyToken, async (req, res) => {
     }
 });
 
-// GET einzelne Aktie (unverändert)
+/**
+ * @swagger
+ * /api/stocks/{symbol}:
+ *   get:
+ *     summary: Get stock data for specific symbol
+ *     tags: [Stocks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: symbol
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Stock symbol
+ *         example: "AAPL"
+ *     responses:
+ *       200:
+ *         description: Stock data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/StockData'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Error fetching stock data
+ */
 router.get('/:symbol', auth.verifyToken, async (req, res) => {
     try {
         const { symbol } = req.params;

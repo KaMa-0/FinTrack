@@ -38,7 +38,7 @@ const Navigation = () => {
     const isAdmin = user?.email === 'admin@fintrack.com';
 
     return (
-        <>
+        <div>
             <button
                 className={`mobile-menu-toggle ${isOpen ? 'active' : ''}`}
                 onClick={toggleMenu}
@@ -115,7 +115,7 @@ const Navigation = () => {
                     <span>Abmelden</span>
                 </button>
             </nav>
-        </>
+        </div>
     );
 };
 
