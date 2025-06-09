@@ -1,83 +1,54 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const { ObjectId } = require('mongodb');
-const WatchList = require('../models/WatchList');
-
-const API_KEY = process.env.FINNHUB_API_KEY;
-const cache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000;
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     WatchlistResponse:
- *       type: array
- *       items:
- *         type: string
- *       example: ["AAPL", "TSLA", "GOOGL"]
- *     StockData:
- *       type: object
- *       properties:
- *         c:
- *           type: number
- *           description: Current price
- *         d:
- *           type: number
- *           description: Change
- *         dp:
- *           type: number
- *           description: Percent change
- *         h:
- *           type: number
- *           description: High price of the day
- *         l:
- *           type: number
- *           description: Low price of the day
- *         o:
- *           type: number
- *           description: Open price of the day
- *         pc:
- *           type: number
- *           description: Previous close price
- */
+const stockController = require('../controllers/stockController');
 
 /**
  * @swagger
  * /api/stocks/watchlist:
  *   get:
- *     summary: Get user's stock watchlist
+ *     summary: Gibt die Watchlist des Benutzers zurück
  *     tags: [Stocks]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: User's watchlist
+ *         description: Erfolgreich abgerufen
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/WatchlistResponse'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 stocks:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       userId:
+ *                         type: string
+ *                       symbol:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       exchange:
+ *                         type: string
  *       401:
- *         description: Unauthorized
+ *         description: Nicht authentifiziert
  *       500:
- *         description: Server error
+ *         description: Serverfehler
  */
-router.get('/watchlist', auth.verifyToken, async (req, res) => {
-    try {
-        const userId = new ObjectId(req.userId);
-        const watchlist = await WatchList.findOne({ userId: userId });
-        res.json(watchlist?.symbols || []);
-    } catch (error) {
-        res.status(500).json({ error: 'Fehler beim Abrufen der Watchlist' });
-    }
-});
+router.get('/watchlist', auth.verifyToken, stockController.getWatchlist);
 
 /**
  * @swagger
  * /api/stocks/watchlist:
  *   post:
- *     summary: Add stock symbol to watchlist
+ *     summary: Fügt eine Aktie zur Watchlist hinzu
  *     tags: [Stocks]
  *     security:
  *       - bearerAuth: []
@@ -92,53 +63,30 @@ router.get('/watchlist', auth.verifyToken, async (req, res) => {
  *             properties:
  *               symbol:
  *                 type: string
- *                 description: Stock symbol to add
- *                 example: "AAPL"
+ *                 description: Das Aktien-Symbol
+ *               name:
+ *                 type: string
+ *                 description: Der Name der Aktie
+ *               exchange:
+ *                 type: string
+ *                 description: Die Börse, an der die Aktie gehandelt wird
  *     responses:
- *       200:
- *         description: Symbol added successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
+ *       201:
+ *         description: Aktie erfolgreich hinzugefügt
  *       400:
- *         description: Symbol is required
+ *         description: Aktie bereits in der Watchlist
  *       401:
- *         description: Unauthorized
+ *         description: Nicht authentifiziert
  *       500:
- *         description: Server error
+ *         description: Serverfehler
  */
-router.post('/watchlist', auth.verifyToken, async (req, res) => {
-    try {
-        const { symbol } = req.body;
-        const userId = new ObjectId(req.userId);
-
-        if (!symbol) {
-            return res.status(400).json({ error: 'Symbol ist erforderlich' });
-        }
-
-        await WatchList.findOneAndUpdate(
-            { userId: userId },
-            { $addToSet: { symbols: symbol } },
-            { upsert: true, new: true }
-        );
-
-        res.json({ success: true, message: 'Symbol zur Watchlist hinzugefügt' });
-    } catch (error) {
-        res.status(500).json({ error: 'Fehler beim Aktualisieren der Watchlist' });
-    }
-});
+router.post('/watchlist', auth.verifyToken, stockController.addToWatchlist);
 
 /**
  * @swagger
  * /api/stocks/watchlist/{symbol}:
  *   delete:
- *     summary: Remove stock symbol from watchlist
+ *     summary: Entfernt eine Aktie aus der Watchlist
  *     tags: [Stocks]
  *     security:
  *       - bearerAuth: []
@@ -148,53 +96,24 @@ router.post('/watchlist', auth.verifyToken, async (req, res) => {
  *         required: true
  *         schema:
  *           type: string
- *         description: Stock symbol to remove
- *         example: "AAPL"
+ *         description: Das Symbol der zu entfernenden Aktie
  *     responses:
  *       200:
- *         description: Symbol removed successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
+ *         description: Aktie erfolgreich entfernt
  *       401:
- *         description: Unauthorized
+ *         description: Nicht authentifiziert
  *       404:
- *         description: Watchlist not found
+ *         description: Aktie nicht gefunden
  *       500:
- *         description: Server error
+ *         description: Serverfehler
  */
-router.delete('/watchlist/:symbol', auth.verifyToken, async (req, res) => {
-    try {
-        const { symbol } = req.params;
-        const userId = new ObjectId(req.userId);
-
-        const result = await WatchList.findOneAndUpdate(
-            { userId: userId },
-            { $pull: { symbols: symbol } },
-            { new: true }
-        );
-
-        if (!result) {
-            return res.status(404).json({ error: 'Watchlist nicht gefunden' });
-        }
-
-        res.json({ success: true, message: 'Symbol von Watchlist entfernt' });
-    } catch (error) {
-        res.status(500).json({ error: 'Fehler beim Entfernen aus der Watchlist' });
-    }
-});
+router.delete('/watchlist/:symbol', auth.verifyToken, stockController.removeFromWatchlist);
 
 /**
  * @swagger
  * /api/stocks/{symbol}:
  *   get:
- *     summary: Get stock data for specific symbol
+ *     summary: Ruft Detaildaten zu einer Aktie ab
  *     tags: [Stocks]
  *     security:
  *       - bearerAuth: []
@@ -204,47 +123,17 @@ router.delete('/watchlist/:symbol', auth.verifyToken, async (req, res) => {
  *         required: true
  *         schema:
  *           type: string
- *         description: Stock symbol
- *         example: "AAPL"
+ *         description: Das Symbol der Aktie
  *     responses:
  *       200:
- *         description: Stock data
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/StockData'
+ *         description: Aktiendaten erfolgreich abgerufen
  *       401:
- *         description: Unauthorized
+ *         description: Nicht authentifiziert
+ *       404:
+ *         description: Aktie nicht gefunden
  *       500:
- *         description: Error fetching stock data
+ *         description: Serverfehler
  */
-router.get('/:symbol', auth.verifyToken, async (req, res) => {
-    try {
-        const { symbol } = req.params;
-        const cached = cache.get(symbol);
-
-        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-            return res.json(cached.data);
-        }
-
-        const response = await fetch(
-            `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`
-        );
-
-        if (!response.ok) {
-            throw new Error('Fehler beim Abrufen der Aktieninformationen');
-        }
-
-        const data = await response.json();
-        cache.set(symbol, {
-            timestamp: Date.now(),
-            data: data
-        });
-
-        res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+router.get('/:symbol', auth.verifyToken, stockController.getStockData);
 
 module.exports = router;
