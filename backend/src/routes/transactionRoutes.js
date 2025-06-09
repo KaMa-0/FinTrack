@@ -5,39 +5,268 @@ const transactionController = require('../controllers/transactionController');
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     Transaction:
+ *       type: object
+ *       required:
+ *         - amount
+ *         - description
+ *         - category
+ *         - type
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: Transaction ID
+ *         amount:
+ *           type: number
+ *           description: Transaction amount
+ *           example: 50.99
+ *         description:
+ *           type: string
+ *           description: Transaction description
+ *           example: "Grocery shopping"
+ *         category:
+ *           type: string
+ *           description: Transaction category
+ *           example: "groceries"
+ *         type:
+ *           type: string
+ *           enum: [income, expense]
+ *           description: Transaction type
+ *           example: "expense"
+ *         date:
+ *           type: string
+ *           format: date-time
+ *           description: Transaction date
+ *         userId:
+ *           type: string
+ *           description: User ID who owns the transaction
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Creation timestamp
+ *     TransactionInput:
+ *       type: object
+ *       required:
+ *         - amount
+ *         - description
+ *         - category
+ *         - type
+ *       properties:
+ *         amount:
+ *           type: number
+ *           description: Transaction amount
+ *           example: 50.99
+ *         description:
+ *           type: string
+ *           description: Transaction description
+ *           example: "Grocery shopping"
+ *         category:
+ *           type: string
+ *           description: Transaction category
+ *           example: "groceries"
+ *         type:
+ *           type: string
+ *           enum: [income, expense]
+ *           description: Transaction type
+ *           example: "expense"
+ *         date:
+ *           type: string
+ *           format: date
+ *           description: Transaction date
+ *           example: "2025-06-09"
+ */
+
+/**
+ * @swagger
  * /api/transactions:
  *   get:
- *     summary: Alle Transaktionen abrufen
+ *     summary: Get all user transactions
  *     tags: [Transactions]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Liste aller Transaktionen
+ *         description: List of user transactions
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   amount:
- *                     type: number
- *                   description:
- *                     type: string
+ *                 $ref: '#/components/schemas/Transaction'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
  */
 router.get('/', auth.verifyToken, transactionController.getTransactions);
 
-// POST - Create transaction
+/**
+ * @swagger
+ * /api/transactions:
+ *   post:
+ *     summary: Create a new transaction
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TransactionInput'
+ *     responses:
+ *       201:
+ *         description: Transaction created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Transaction'
+ *       400:
+ *         description: Invalid input data
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
 router.post('/', auth.verifyToken, transactionController.createTransaction);
 
-// PUT - Update entire transaction
+/**
+ * @swagger
+ * /api/transactions/{id}:
+ *   put:
+ *     summary: Update entire transaction
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Transaction ID
+ *         example: "60f7b1b9e4b0a12345678901"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TransactionInput'
+ *     responses:
+ *       200:
+ *         description: Transaction updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Transaction'
+ *       400:
+ *         description: Invalid input data
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Transaction not found
+ *       500:
+ *         description: Server error
+ */
 router.put('/:id', auth.verifyToken, transactionController.updateTransaction);
 
-// PATCH - Partially update transaction
+/**
+ * @swagger
+ * /api/transactions/{id}:
+ *   patch:
+ *     summary: Partially update transaction
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Transaction ID
+ *         example: "60f7b1b9e4b0a12345678901"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 description: New amount
+ *                 example: 75.50
+ *               description:
+ *                 type: string
+ *                 description: New description
+ *               category:
+ *                 type: string
+ *                 description: New category
+ *               type:
+ *                 type: string
+ *                 enum: [income, expense]
+ *                 description: New type
+ *               date:
+ *                 type: string
+ *                 format: date
+ *                 description: New date
+ *           example:
+ *             amount: 75.50
+ *     responses:
+ *       200:
+ *         description: Transaction updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Transaction'
+ *       400:
+ *         description: Invalid input data
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Transaction not found
+ *       500:
+ *         description: Server error
+ */
 router.patch('/:id', auth.verifyToken, transactionController.patchTransaction);
 
-// DELETE - Delete transaction
+/**
+ * @swagger
+ * /api/transactions/{id}:
+ *   delete:
+ *     summary: Delete a transaction
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Transaction ID
+ *         example: "60f7b1b9e4b0a12345678901"
+ *     responses:
+ *       200:
+ *         description: Transaction deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Transaction deleted successfully"
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Transaction not found
+ *       500:
+ *         description: Server error
+ */
 router.delete('/:id', auth.verifyToken, transactionController.deleteTransaction);
 
 module.exports = router;
