@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TransactionService } from '../services/transactionService';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Transaction() {
     const [amount, setAmount] = useState('');
@@ -24,7 +23,7 @@ function Transaction() {
             navigate('/login');
         }
     }, []);
-
+    // This function is called to fetch data when the component loads.
     const fetchTransactions = async () => {
         try {
             const data = await TransactionService.fetchAll(user.token);

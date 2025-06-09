@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../services/authService';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './Pages.css';
 
 function Login() {

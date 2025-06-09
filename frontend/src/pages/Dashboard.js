@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './Dashboard.css';
+import {authService} from "../services/authService";
 
 function Dashboard() {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = authService.getCurrentUser();
     const navigate = useNavigate();
     const [transactions, setTransactions] = useState([]);
     const [balance, setBalance] = useState(0);
@@ -50,7 +50,7 @@ function Dashboard() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
+        authService.logout();
         navigate('/landing');
     };
 

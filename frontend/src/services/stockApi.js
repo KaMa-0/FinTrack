@@ -1,9 +1,13 @@
-const API_KEY = 'd12rsp9r01qv1k0mslugd12rsp9r01qv1k0mslv0';
-const BASE_URL = 'https://finnhub.io/api/v1';
+const API_BASE = 'http://localhost:5001/api/stocks';
 
 export const fetchStockData = async (symbol) => {
     try {
-        const response = await fetch(`${BASE_URL}/quote?symbol=${symbol}&token=${API_KEY}`);
+        const user = JSON.parse(localStorage.getItem('user'));
+        const response = await fetch(`${API_BASE}/${symbol}`, {
+            headers: {
+                'Authorization': `Bearer ${user.token}`
+            }
+        });
         if (!response.ok) throw new Error('API Fehler');
         return response.json();
     } catch (error) {
@@ -14,9 +18,14 @@ export const fetchStockData = async (symbol) => {
 
 export const getWatchlist = async () => {
     try {
-        // Temporär: Verwendung von localStorage bis Backend implementiert ist
-        const watchlist = localStorage.getItem('watchlist');
-        return watchlist ? JSON.parse(watchlist) : [];
+        const user = JSON.parse(localStorage.getItem('user'));
+        const response = await fetch(`${API_BASE}/watchlist`, {
+            headers: {
+                'Authorization': `Bearer ${user.token}`
+            }
+        });
+        if (!response.ok) throw new Error('Watchlist laden fehlgeschlagen');
+        return response.json();
     } catch (error) {
         console.error('Fehler beim Laden der Watchlist:', error);
         throw error;
@@ -25,13 +34,17 @@ export const getWatchlist = async () => {
 
 export const addToWatchlist = async (symbol) => {
     try {
-        // Temporär: Verwendung von localStorage bis Backend implementiert ist
-        const watchlist = await getWatchlist();
-        if (!watchlist.includes(symbol)) {
-            watchlist.push(symbol);
-            localStorage.setItem('watchlist', JSON.stringify(watchlist));
-        }
-        return watchlist;
+        const user = JSON.parse(localStorage.getItem('user'));
+        const response = await fetch(`${API_BASE}/watchlist`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user.token}`
+            },
+            body: JSON.stringify({ symbol })
+        });
+        if (!response.ok) throw new Error('Hinzufügen fehlgeschlagen');
+        return response.json();
     } catch (error) {
         console.error('Fehler beim Hinzufügen zur Watchlist:', error);
         throw error;
@@ -40,11 +53,15 @@ export const addToWatchlist = async (symbol) => {
 
 export const removeFromWatchlist = async (symbol) => {
     try {
-        // Temporär: Verwendung von localStorage bis Backend implementiert ist
-        const watchlist = await getWatchlist();
-        const updatedWatchlist = watchlist.filter(s => s !== symbol);
-        localStorage.setItem('watchlist', JSON.stringify(updatedWatchlist));
-        return updatedWatchlist;
+        const user = JSON.parse(localStorage.getItem('user'));
+        const response = await fetch(`${API_BASE}/watchlist/${symbol}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${user.token}`
+            }
+        });
+        if (!response.ok) throw new Error('Entfernen fehlgeschlagen');
+        return response.json();
     } catch (error) {
         console.error('Fehler beim Entfernen von der Watchlist:', error);
         throw error;

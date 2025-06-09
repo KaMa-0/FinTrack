@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Navigation.css';
+import {authService} from "../services/authService";
 
 const Navigation = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +30,7 @@ const Navigation = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
+        authService.logout();
         window.location.href = '/landing';
     };
 

@@ -2,7 +2,7 @@ const API_URL = 'http://localhost:5001/api/transactions';
 
 export const TransactionService = {
     async fetchAll(token) { // If there is no specific method like the others than it is GET.
-        const response = await fetch(API_URL, {
+        const response = await fetch(API_URL, { // Pauses the function until the request completes.
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!response.ok) throw new Error('Fehler beim Laden der Transaktionen');
