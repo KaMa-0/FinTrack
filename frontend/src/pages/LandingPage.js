@@ -27,8 +27,6 @@ function LandingPage() {
                     </button>
                     <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
                         <Link to="/about" onClick={() => setIsMenuOpen(false)}>Über uns</Link>
-                        <Link to="/gallery" onClick={() => setIsMenuOpen(false)}>Galerie</Link>
-                        <Link to="/contact" onClick={() => setIsMenuOpen(false)}>Kontakt</Link>
                         <Link to="/login" className="btn-login" onClick={() => setIsMenuOpen(false)}>Anmelden</Link>
                         <Link to="/register" className="btn-register" onClick={() => setIsMenuOpen(false)}>Registrieren</Link>
                     </div>
