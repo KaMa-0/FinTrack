@@ -1,4 +1,3 @@
-// src/services/authService.js
 const API_URL = 'http://localhost:5001/api/auth/'; //
 export const authService = {
     // Register a new user
@@ -16,7 +15,6 @@ export const authService = {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Registration failed');
             }
-
             const data = await response.json();
             // Store the token in localStorage
             localStorage.setItem('user', JSON.stringify({ email: userData.email, token: data.token }));

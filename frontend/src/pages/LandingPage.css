@@ -2,6 +2,8 @@
 .landing-page {
     min-height: 100vh;
     background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Navigation */
@@ -88,6 +90,9 @@
     font-size: 1.3rem;
     margin-bottom: 30px;
 }
+.hero .features {
+    flex: 1;
+}
 
 .cta-button {
     display: inline-block;
@@ -155,6 +160,7 @@
 
 /* Footer */
 .landing-footer {
+    margin-top: auto;
     background: #333;
     color: white;
     text-align: center;
