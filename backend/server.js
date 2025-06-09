@@ -1,15 +1,15 @@
-const express = require('express');
+const express = require('express'); // Foundation of the backend application.
 const mongoose = require('mongoose');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./swagger');
 require('dotenv').config();
 
-const app = express();
+const app = express(); //Creates an instance of express application.
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors()); // Allows cross-origin requests from the frontend.
+app.use(express.json()); // It makes the JSON data sent in POST or PUT available on the req.body property.
 
 // Swagger-Dokumentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
