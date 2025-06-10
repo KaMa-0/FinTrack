@@ -221,7 +221,6 @@ function Transaction() {
                                 </div>
                                 <div className="d-flex gap-2">
                                     <button type="submit" className="btn btn-primary flex-grow-1" disabled={loading}>
-                                        <i className="fas fa-save me-2"></i>
                                         {loading ? 'Wird gespeichert...' : (editingId ? 'Aktualisieren' : 'Speichern')}
                                     </button>
                                     {editingId && (

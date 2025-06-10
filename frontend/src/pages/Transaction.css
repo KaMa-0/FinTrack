@@ -62,8 +62,7 @@
 /* Action Buttons */
 .action-buttons {
     display: flex;
-    gap: 5px;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 .action-btn {
