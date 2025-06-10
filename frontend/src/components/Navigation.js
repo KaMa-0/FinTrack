@@ -57,8 +57,6 @@ const Navigation = () => {
                         fontWeight: '500',
                         transition: 'background 0.3s'
                     }}
-                    onMouseOver={(e) => e.target.style.background = '#c0392b'}
-                    onMouseOut={(e) => e.target.style.background = '#e74c3c'}
                 >
                     <i className="fas fa-sign-out-alt"></i>
                     <span>Logout</span>

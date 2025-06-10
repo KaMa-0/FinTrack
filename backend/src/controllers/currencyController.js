@@ -14,7 +14,7 @@ exports.convertCurrency = async (req, res) => {
             `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`
         );
 
-        const rate = response.data.rates[toCurrency];
+        const rate = response.data.rates[toCurrency]; // Automatic JSON parse
         const result = (parseFloat(amount) * rate).toFixed(2);
 
         res.json({ // M5_req -> data returned as JSON for GET call
@@ -24,7 +24,7 @@ exports.convertCurrency = async (req, res) => {
             result: parseFloat(result),
             rate
         });
-    } catch (error) {
+    } catch (error) { // Automatic error handling
         res.status(500).json({ error: 'Währungsumrechnung fehlgeschlagen' });
     }
 };

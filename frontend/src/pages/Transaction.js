@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TransactionService } from '../services/transactionService';
+import './Transaction.css';
 
 function Transaction() {
     const [amount, setAmount] = useState('');
@@ -15,7 +16,6 @@ function Transaction() {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
-    // Neuer useEffect Hook für automatisches Laden
     useEffect(() => {
         if (user && user.token) {
             fetchTransactions();
@@ -23,7 +23,7 @@ function Transaction() {
             navigate('/login');
         }
     }, []);
-    // This function is called to fetch data when the component loads.
+
     const fetchTransactions = async () => {
         try {
             const data = await TransactionService.fetchAll(user.token);
@@ -80,6 +80,9 @@ function Transaction() {
         setType(transaction.type);
         setDate(transaction.date.substr(0, 10));
         setEditingId(transaction._id);
+
+        // Scroll to top on mobile
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const resetForm = () => {
@@ -104,10 +107,10 @@ function Transaction() {
     };
 
     return (
-        <div className="container mt-4">
+        <div className="transaction-container">
             <div className="row">
-                <div className="col-md-6">
-                    <div className="card">
+                <div className="col-12 col-md-6">
+                    <div className="card transaction-card">
                         <div className="card-header d-flex justify-content-between align-items-center">
                             <h5 className="mb-0">
                                 {editingId ? 'Transaktion bearbeiten' : 'Neue Transaktion'}
@@ -116,15 +119,16 @@ function Transaction() {
                                 onClick={() => navigate('/dashboard')}
                                 className="btn btn-sm btn-outline-secondary"
                             >
-                                Zurück
+                                <i className="fas fa-arrow-left d-md-none"></i>
+                                <span className="d-none d-md-inline">Zurück</span>
                             </button>
                         </div>
                         <div className="card-body">
-                            <form onSubmit={handleSubmit}>
+                            <form onSubmit={handleSubmit} className="transaction-form">
                                 <div className="mb-3">
                                     <label className="form-label">Typ</label>
-                                    <div>
-                                        <div className="form-check form-check-inline">
+                                    <div className="type-selector">
+                                        <div className="form-check">
                                             <input
                                                 className="form-check-input"
                                                 type="radio"
@@ -138,7 +142,7 @@ function Transaction() {
                                                 Ausgabe
                                             </label>
                                         </div>
-                                        <div className="form-check form-check-inline">
+                                        <div className="form-check">
                                             <input
                                                 className="form-check-input"
                                                 type="radio"
@@ -155,10 +159,11 @@ function Transaction() {
                                     </div>
                                 </div>
                                 <div className="mb-3">
+                                    <label className="form-label">Betrag (€)</label>
                                     <input
                                         type="number"
                                         className="form-control"
-                                        placeholder="Betrag (€)"
+                                        placeholder="0.00"
                                         step="0.01"
                                         min="0.01"
                                         value={amount}
@@ -167,16 +172,17 @@ function Transaction() {
                                     />
                                 </div>
                                 <div className="mb-3">
+                                    <label className="form-label">Beschreibung</label>
                                     <input
                                         type="text"
                                         className="form-control"
-                                        placeholder="Beschreibung"
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
                                         required
                                     />
                                 </div>
                                 <div className="mb-3">
+                                    <label className="form-label">Kategorie</label>
                                     <select
                                         className="form-select"
                                         value={category}
@@ -204,6 +210,7 @@ function Transaction() {
                                     </select>
                                 </div>
                                 <div className="mb-3">
+                                    <label className="form-label">Datum</label>
                                     <input
                                         type="date"
                                         className="form-control"
@@ -218,6 +225,7 @@ function Transaction() {
                                     </button>
                                     {editingId && (
                                         <button type="button" className="btn btn-secondary" onClick={resetForm}>
+                                            <i className="fas fa-times me-2"></i>
                                             Abbrechen
                                         </button>
                                     )}
@@ -227,60 +235,119 @@ function Transaction() {
                     </div>
                 </div>
 
-                <div className="col-md-6">
-                    <div className="card">
+                <div className="col-12 col-md-6">
+                    <div className="card transaction-card">
                         <div className="card-header">
-                            <h5 className="mb-0">Meine Transaktionen</h5>
+                            <h5 className="mb-0">
+                                <i className="fas fa-list me-2"></i>
+                                Meine Transaktionen
+                            </h5>
                         </div>
                         <div className="card-body">
                             {transactions.length === 0 ? (
-                                <p className="text-muted">Keine Transaktionen vorhanden</p>
-                            ) : (
-                                <div className="table-responsive">
-                                    <table className="table table-sm">
-                                        <thead>
-                                        <tr>
-                                            <th>Datum</th>
-                                            <th>Beschreibung</th>
-                                            <th>Betrag</th>
-                                            <th>Aktionen</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {transactions
-					    .sort((a, b) => new Date(b.date) - new Date(a.date))
-					    .map(transaction => (
-                                            <tr key={transaction._id}>
-                                                <td>{new Date(transaction.date).toLocaleDateString('de-DE')}</td>
-                                                <td>{transaction.description}</td>
-                                                <td className={transaction.type === 'income' ? 'text-success' : 'text-danger'}>
-                                                    {transaction.type === 'income' ? '+' : '-'}€{transaction.amount.toFixed(2)}
-                                                </td>
-                                                <td>
-                                                    <button
-                                                        className="btn btn-sm btn-outline-primary me-1"
-                                                        onClick={() => handleEdit(transaction)}
-                                                    >
-                                                        <i className="fas fa-edit"></i>
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-sm btn-outline-warning me-1"
-                                                        onClick={() => handleAmountUpdate(transaction)}
-                                                    >
-                                                        <i className="fas fa-coins"></i>
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-sm btn-outline-danger"
-                                                        onClick={() => handleDelete(transaction._id)}
-                                                    >
-                                                        <i className="fas fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </table>
+                                <div className="text-center py-4">
+                                    <i className="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <p className="text-muted">Keine Transaktionen vorhanden</p>
                                 </div>
+                            ) : (
+                                <>
+                                    {/* Desktop Table View */}
+                                    <div className="table-responsive">
+                                        <table className="table table-sm transaction-table">
+                                            <thead>
+                                            <tr>
+                                                <th>Datum</th>
+                                                <th>Beschreibung</th>
+                                                <th>Betrag</th>
+                                                <th>Aktionen</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {transactions
+                                                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                                .map(transaction => (
+                                                    <tr key={transaction._id}>
+                                                        <td>{new Date(transaction.date).toLocaleDateString('de-DE')}</td>
+                                                        <td>
+                                                            <div>{transaction.description}</div>
+                                                        </td>
+                                                        <td className={`text-end ${transaction.type === 'income' ? 'text-success' : 'text-danger'}`}>
+                                                            <strong>
+                                                                {transaction.type === 'income' ? '+' : '-'}€{transaction.amount.toFixed(2)}
+                                                            </strong>
+                                                        </td>
+                                                        <td>
+                                                            <div className="action-buttons">
+                                                                <button
+                                                                    className="btn btn-sm btn-outline-primary action-btn"
+                                                                    onClick={() => handleEdit(transaction)}
+                                                                    title="Bearbeiten"
+                                                                >
+                                                                    <i className="fas fa-edit"></i>
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-sm btn-outline-warning action-btn"
+                                                                    onClick={() => handleAmountUpdate(transaction)}
+                                                                    title="Betrag ändern"
+                                                                >
+                                                                    <i className="fas fa-coins"></i>
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-sm btn-outline-danger action-btn"
+                                                                    onClick={() => handleDelete(transaction._id)}
+                                                                    title="Löschen"
+                                                                >
+                                                                    <i className="fas fa-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Mobile Card View */}
+                                    <div className="mobile-transaction-list">
+                                        {transactions
+                                            .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                            .map(transaction => (
+                                                <div key={transaction._id} className="transaction-item-card">
+                                                    <div className="transaction-item-header">
+                                                        <span className="transaction-date">
+                                                            {new Date(transaction.date).toLocaleDateString('de-DE')}
+                                                        </span>
+                                                        <span className={`transaction-amount ${transaction.type === 'income' ? 'text-success' : 'text-danger'}`}>
+                                                            {transaction.type === 'income' ? '+' : '-'}€{transaction.amount.toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="transaction-description">
+                                                        {transaction.description}
+                                                    </div>
+                                                    <div className="transaction-actions">
+                                                        <button
+                                                            className="btn btn-sm btn-outline-primary mobile-action-btn"
+                                                            onClick={() => handleEdit(transaction)}
+                                                        >
+                                                            <i className="fas fa-edit"></i>Bearbeiten
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-warning mobile-action-btn"
+                                                            onClick={() => handleAmountUpdate(transaction)}
+                                                        >
+                                                            <i className="fas fa-coins"></i>Betrag Ändern
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-danger mobile-action-btn"
+                                                            onClick={() => handleDelete(transaction._id)}
+                                                        >
+                                                            <i className="fas fa-trash"></i>Löschen
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </>
                             )}
                         </div>
                     </div>

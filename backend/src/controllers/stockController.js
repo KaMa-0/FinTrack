@@ -85,12 +85,12 @@ exports.getStockData = async (req, res) => {
         const response = await fetch(
             `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`
         );
-
+        // Manuel error handling
         if (!response.ok) {
             throw new Error('Fehler beim Abrufen der Aktieninformationen');
         }
 
-        const data = await response.json();
+        const data = await response.json(); // Manuel JSON parsing
         cache.set(symbol, {
             timestamp: Date.now(),
             data: data
