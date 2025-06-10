@@ -21,7 +21,7 @@ function StockWatch() {
     const loadWatchlist = async () => {
         try {
             setLoading(true);
-            setError('');
+            setError(''); //Clears any previous error
 
             console.log('🔄 Loading watchlist...');
             const symbols = await StockService.getWatchlist(user.token);
@@ -75,7 +75,6 @@ function StockWatch() {
                     change: parseFloat(data.d || 0).toFixed(2),
                     changePercent: parseFloat(data.dp || 0).toFixed(2),
                     lastUpdated: new Date().toLocaleTimeString(),
-                    raw: data // Keep raw data for debugging
                 };
 
                 setStockData(prevData => ({

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TransactionService } from '../services/transactionService';
+import './Pages.css';
 
 function Transaction() {
     const [amount, setAmount] = useState('');
@@ -15,7 +16,6 @@ function Transaction() {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
-    // Neuer useEffect Hook für automatisches Laden
     useEffect(() => {
         if (user && user.token) {
             fetchTransactions();
@@ -23,7 +23,7 @@ function Transaction() {
             navigate('/login');
         }
     }, []);
-    // This function is called to fetch data when the component loads.
+
     const fetchTransactions = async () => {
         try {
             const data = await TransactionService.fetchAll(user.token);
@@ -104,7 +104,7 @@ function Transaction() {
     };
 
     return (
-        <div className="container mt-4">
+        <div className="container-fluid mt-4">
             <div className="row">
                 <div className="col-md-6">
                     <div className="card">
@@ -237,7 +237,7 @@ function Transaction() {
                                 <p className="text-muted">Keine Transaktionen vorhanden</p>
                             ) : (
                                 <div className="table-responsive">
-                                    <table className="table table-sm">
+                                    <table className="table table-sm transaction-table">
                                         <thead>
                                         <tr>
                                             <th>Datum</th>
@@ -248,36 +248,41 @@ function Transaction() {
                                         </thead>
                                         <tbody>
                                         {transactions
-					    .sort((a, b) => new Date(b.date) - new Date(a.date))
-					    .map(transaction => (
-                                            <tr key={transaction._id}>
-                                                <td>{new Date(transaction.date).toLocaleDateString('de-DE')}</td>
-                                                <td>{transaction.description}</td>
-                                                <td className={transaction.type === 'income' ? 'text-success' : 'text-danger'}>
-                                                    {transaction.type === 'income' ? '+' : '-'}€{transaction.amount.toFixed(2)}
-                                                </td>
-                                                <td>
-                                                    <button
-                                                        className="btn btn-sm btn-outline-primary me-1"
-                                                        onClick={() => handleEdit(transaction)}
-                                                    >
-                                                        <i className="fas fa-edit"></i>
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-sm btn-outline-warning me-1"
-                                                        onClick={() => handleAmountUpdate(transaction)}
-                                                    >
-                                                        <i className="fas fa-coins"></i>
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-sm btn-outline-danger"
-                                                        onClick={() => handleDelete(transaction._id)}
-                                                    >
-                                                        <i className="fas fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                            .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                            .map(transaction => (
+                                                <tr key={transaction._id}>
+                                                    <td>{new Date(transaction.date).toLocaleDateString('de-DE')}</td>
+                                                    <td>{transaction.description}</td>
+                                                    <td className={transaction.type === 'income' ? 'text-success' : 'text-danger'}>
+                                                        {transaction.type === 'income' ? '+' : '-'}€{transaction.amount.toFixed(2)}
+                                                    </td>
+                                                    <td>
+                                                        <div className="action-buttons">
+                                                            <button
+                                                                className="btn btn-sm btn-outline-primary action-btn"
+                                                                onClick={() => handleEdit(transaction)}
+                                                                title="Bearbeiten"
+                                                            >
+                                                                <i className="fas fa-edit"></i>
+                                                            </button>
+                                                            <button
+                                                                className="btn btn-sm btn-outline-warning action-btn"
+                                                                onClick={() => handleAmountUpdate(transaction)}
+                                                                title="Betrag ändern"
+                                                            >
+                                                                <i className="fas fa-coins"></i>
+                                                            </button>
+                                                            <button
+                                                                className="btn btn-sm btn-outline-danger action-btn"
+                                                                onClick={() => handleDelete(transaction._id)}
+                                                                title="Löschen"
+                                                            >
+                                                                <i className="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
