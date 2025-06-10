@@ -255,6 +255,41 @@
         width: 100%;
     }
 }
+/* Additional styles for better medium screen support */
+@media (min-width: 769px) and (max-width: 1200px) {
+    /* Show only icons with tooltips on medium screens */
+    .action-btn {
+        position: relative;
+    }
+
+    .action-btn:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        z-index: 1000;
+        margin-bottom: 5px;
+    }
+
+    .action-btn:hover::before {
+        content: '';
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #333;
+        margin-bottom: -5px;
+        z-index: 1000;
+    }
+}
 
 /* Icon visibility fix for all screen sizes */
 .action-btn i,
